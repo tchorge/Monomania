@@ -1,0 +1,255 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import * as api from './lib/storage.js';
+import { novaFicha, pvMaximo } from './data/rules.js';
+import Sheet from './components/Sheet.jsx';
+
+function Login({ onLogin }) {
+  const [semUsuarios, setSemUsuarios] = useState(false);
+  const [modo, setModo] = useState('entrar');
+  const [usuario, setUsuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [nome, setNome] = useState('');
+  const [erro, setErro] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    api.estado().then((e) => {
+      setSemUsuarios(e.semUsuarios);
+      if (e.semUsuarios) setModo('registrar');
+    }).catch(() => setErro('Não foi possível falar com o servidor.'));
+  }, []);
+
+  const enviar = async (ev) => {
+    ev.preventDefault();
+    setBusy(true);
+    setErro('');
+    try {
+      const r = modo === 'entrar' ? await api.entrar(usuario, senha) : await api.registrar(usuario, senha, nome);
+      api.setToken(r.token);
+      onLogin({ usuario: r.usuario, nome: r.nome, papel: r.papel });
+    } catch (e) {
+      setErro(e.message);
+    }
+    setBusy(false);
+  };
+
+  return (
+    <form className="home login" onSubmit={enviar}>
+      <img src="/img/dado2.png" alt="" className="logo" />
+      <h1>MONOMANIA</h1>
+      <p className="sub">{modo === 'entrar' ? 'Entrar' : semUsuarios ? 'Criar conta do Mestre' : 'Criar conta de Jogador'}</p>
+      {semUsuarios && <p className="aviso">Esta é a primeira conta: ela será o <b>Mestre</b> da mesa.</p>}
+      {modo === 'registrar' && (
+        <label>Nome de exibição<input value={nome} onChange={(e) => setNome(e.target.value)} /></label>
+      )}
+      <label>Usuário<input value={usuario} autoCapitalize="none" autoComplete="username" onChange={(e) => setUsuario(e.target.value)} /></label>
+      <label>Senha<input type="password" value={senha} autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'} onChange={(e) => setSenha(e.target.value)} /></label>
+      {erro && <p className="alerta">{erro}</p>}
+      <button disabled={busy}>{modo === 'entrar' ? 'Entrar' : 'Criar conta'}</button>
+      {!semUsuarios && (
+        <button type="button" className="sec" onClick={() => { setModo(modo === 'entrar' ? 'registrar' : 'entrar'); setErro(''); }}>
+          {modo === 'entrar' ? 'Criar conta' : 'Já tenho conta'}
+        </button>
+      )}
+    </form>
+  );
+}
+
+const Mini = ({ f }) => {
+  const max = pvMaximo(f.especiais?.VIG || 1) + (Number(f.pv?.extra) || 0);
+  const pv = f.pv?.atual ?? 0;
+  const ps = f.ps?.atual ?? 0;
+  return (
+    <>
+      <div className="mini-bar"><i style={{ width: `${Math.max(0, Math.min(100, (pv / max) * 100))}%`, background: '#b3202a' }} /><span>PV {pv}/{max}</span></div>
+      <div className="mini-bar"><i style={{ width: `${Math.max(0, Math.min(100, ps))}%`, background: '#3b6fb3' }} /><span>PS {ps}%</span></div>
+      <small>Pulsões: {f.pulsoes?.atual ?? 0}{f.condicoes?.length ? ` · ${f.condicoes.join(', ')}` : ''}</small>
+    </>
+  );
+};
+
+function Cards({ lista, onAbrir, onApagar, vazio }) {
+  if (!lista.length) return <p className="vazio">{vazio}</p>;
+  return (
+    <div className="cards grade">
+      {lista.map((f) => (
+        <div className="card" key={f.id}>
+          <button className="card-main" onClick={() => onAbrir(f.id)}>
+            <div className="card-topo">
+              <img src={f.foto || '/img/character3.png'} alt="" />
+              <div>
+                <strong>{f.nome || 'Sem nome'}</strong>
+                <span>{[f.donoNome, f.campanha].filter(Boolean).join(' · ') || '—'}</span>
+              </div>
+            </div>
+            <Mini f={f} />
+          </button>
+          {onApagar && <button className="x" title="Excluir" onClick={() => onApagar(f)}>✕</button>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Jogadores() {
+  const [lista, setLista] = useState([]);
+  useEffect(() => { api.usuarios().then(setLista).catch(() => {}); }, []);
+  const redef = async (u) => {
+    const s = prompt(`Nova senha para ${u.nome} (mín. 4 caracteres):`);
+    if (!s) return;
+    try { await api.redefinirSenha(u.usuario, s); alert('Senha alterada.'); } catch (e) { alert(e.message); }
+  };
+  return (
+    <div className="cards">
+      {lista.map((u) => (
+        <div className="card" key={u.usuario}>
+          <div className="card-main"><strong>{u.nome}</strong><span>{u.usuario} · {u.papel}</span></div>
+          {u.papel !== 'mestre' && <button className="sec" onClick={() => redef(u)}>Redefinir senha</button>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Home({ user, fichas, conectado, onAbrir, onSair, recarregar }) {
+  const [aba, setAba] = useState('mesa');
+  const fileRef = useRef();
+  const mestre = user.papel === 'mestre';
+  const minhas = fichas.filter((f) => f.owner === user.usuario);
+  const mesa = fichas.filter((f) => f.owner !== user.usuario);
+
+  const criar = async () => {
+    const f = novaFicha();
+    await api.salvar(f);
+    onAbrir(f.id, { ...f, owner: user.usuario });
+  };
+  const apagar = async (f) => {
+    if (!confirm(`Excluir a ficha de ${f.nome || 'sem nome'}?`)) return;
+    await api.excluir(f.id);
+    recarregar();
+  };
+  const importar = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const f = JSON.parse(await file.text());
+      await api.salvar({ ...novaFicha(), ...f, id: novaFicha().id });
+      recarregar();
+    } catch {
+      alert('Arquivo inválido.');
+    }
+    e.target.value = '';
+  };
+
+  return (
+    <div className="home home-larga">
+      <header className="topo">
+        <div>
+          <strong>{user.nome}</strong> <small>({mestre ? 'Mestre' : 'Jogador'})</small>
+          <span className={`ponto ${conectado ? 'on' : 'off'}`} title={conectado ? 'Ao vivo' : 'Reconectando…'} />
+        </div>
+        <button className="sec" onClick={onSair}>Sair</button>
+      </header>
+      <img src="/img/dado2.png" alt="" className="logo" />
+      <h1>MONOMANIA</h1>
+
+      {mestre && (
+        <div className="abas">
+          <button className={aba === 'mesa' ? 'ativa' : ''} onClick={() => setAba('mesa')}>Mesa ({mesa.length})</button>
+          <button className={aba === 'minhas' ? 'ativa' : ''} onClick={() => setAba('minhas')}>NPCs / Minhas ({minhas.length})</button>
+          <button className={aba === 'jogadores' ? 'ativa' : ''} onClick={() => setAba('jogadores')}>Contas</button>
+        </div>
+      )}
+
+      {mestre && aba === 'mesa' && (
+        <>
+          <p className="sub">Fichas dos jogadores, ao vivo. Toque em uma para abrir e editar.</p>
+          <Cards lista={mesa} onAbrir={onAbrir} onApagar={apagar} vazio="Nenhum jogador criou ficha ainda." />
+        </>
+      )}
+      {mestre && aba === 'jogadores' && <Jogadores />}
+      {(!mestre || aba === 'minhas') && (
+        <>
+          <div className="acoes">
+            <button onClick={criar}>+ Nova ficha</button>
+            <button className="sec" onClick={() => fileRef.current.click()}>Importar JSON</button>
+            <input ref={fileRef} type="file" accept="application/json" hidden onChange={importar} />
+          </div>
+          <Cards lista={minhas} onAbrir={onAbrir} onApagar={apagar} vazio="Nenhuma ficha ainda." />
+        </>
+      )}
+    </div>
+  );
+}
+
+export default function App() {
+  const [user, setUser] = useState(undefined); // undefined = carregando, null = deslogado
+  const [fichas, setFichas] = useState([]);
+  const [aberta, setAberta] = useState(null);
+  const [conectado, setConectado] = useState(false);
+
+  const logout = () => {
+    api.setToken(null);
+    setUser(null);
+    setAberta(null);
+    setFichas([]);
+  };
+
+  useEffect(() => {
+    api.onDeslogar(logout);
+    if (!api.getToken()) return setUser(null);
+    api.eu().then(setUser).catch(() => setUser(null));
+  }, []);
+
+  const recarregar = () => api.listar().then(setFichas).catch(() => {});
+
+  useEffect(() => {
+    if (!user) return;
+    recarregar();
+    const parar = api.assinar({
+      onStatus: (ok) => {
+        setConectado(ok);
+        if (ok) recarregar();
+      },
+      onFicha: (f) => setFichas((l) => (l.some((x) => x.id === f.id) ? l.map((x) => (x.id === f.id ? f : x)) : [f, ...l])),
+      onExcluida: (id) => setFichas((l) => l.filter((x) => x.id !== id)),
+    });
+    return parar;
+  }, [user]);
+
+  const ordenadas = useMemo(() => [...fichas].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)), [fichas]);
+
+  if (user === undefined) return null;
+  if (!user) return <Login onLogin={setUser} />;
+
+  if (aberta) {
+    const atual = fichas.find((f) => f.id === aberta.id);
+    return (
+      <Sheet
+        key={aberta.id}
+        inicial={aberta}
+        remota={atual}
+        mestre={user.papel === 'mestre'}
+        conectado={conectado}
+        onVoltar={() => {
+          setAberta(null);
+          recarregar();
+        }}
+      />
+    );
+  }
+
+  return (
+    <Home
+      user={user}
+      fichas={ordenadas}
+      conectado={conectado}
+      recarregar={recarregar}
+      onAbrir={async (id, f) => setAberta(f || (await api.carregar(id)))}
+      onSair={async () => {
+        await api.sair();
+        logout();
+      }}
+    />
+  );
+}
