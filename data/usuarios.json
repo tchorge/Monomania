@@ -1,0 +1,20 @@
+{
+  "besest": {
+    "nome": "Mestre",
+    "papel": "mestre",
+    "salt": "70fe4c57fcabe0b63402fa495a81d061",
+    "hash": "b4c34d686f5c049f645b500589e29b12a02869f6110b2b55924fb85fc4e4bd4d"
+  },
+  "george": {
+    "nome": "Webber",
+    "papel": "jogador",
+    "salt": "2ed98a13a0ff99faca105f0f57b80143",
+    "hash": "404bad5b420542b7219676351e44737a9b08af9d17e1db282b840b1cdc58199c"
+  },
+  "bewlla": {
+    "nome": "Isabella",
+    "papel": "jogador",
+    "salt": "d492ba80050c1ac5db580359962b91e8",
+    "hash": "634069428480c4546ab3fa1e99d9e88e9b63cf62dd6668ad319bebffd86fac9a"
+  }
+}
