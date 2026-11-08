@@ -40,6 +40,8 @@ export const sair = () => post('/api/sair', {}).catch(() => {});
 export const usuarios = () => req('/api/usuarios');
 export const redefinirSenha = (u, senha) => post(`/api/usuarios/${u}/senha`, { senha });
 
+export const npcs = () => req('/api/npcs');
+
 export const listar = () => req('/api/fichas');
 export const carregar = (id) => req(`/api/fichas/${id}`);
 export const excluir = (id) => req(`/api/fichas/${id}`, { method: 'DELETE' });

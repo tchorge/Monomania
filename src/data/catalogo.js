@@ -418,11 +418,25 @@ export const EQUIPAMENTOS = [
   "desc": "→ 4d6 de dano (+1d6 a queima-roupa)\n→ Tiros por turno: 1 (sem desvantagem)\n→ Distância: Curta\n→ Capacidade: Variável\n→ Categoria: 3\n→ Carga: 3"
  },
  {
-  "categoria": "Armas de Fogo",
-  "nome": "Granada",
+  "categoria": "Explosivos",
+  "nome": "Granada de Fragmentação",
   "cat": "2",
   "carga": "1",
-  "desc": "→ 5d6 (+2d6 a queima-roupa)\n→ Distância: Curta\n→ Categoria: 2\n→ Carga: 1"
+  "desc": "→ 5d6 (+2d6 a queima-roupa)\n→ Efeito: Cria uma forte explosão de fragmentos em um raio de 5m. A partir dessa distância, o dano da granada diminui em -1d6 por metro.\n→ Distância: Curta\n→ Categoria: 2\n→ Carga: 1"
+ },
+ {
+  "categoria": "Explosivos",
+  "nome": "Granada de Luz (Flashbang)",
+  "cat": "2",
+  "carga": "1",
+  "desc": "→ Efeito: Cria um forte feixe de luz atordoante em um raio de 3m, cegando, ensurdecendo e aplicando o status de Suscetível por 1 turno em todos os alvos na área de efeito.\n→ Distância: Curta\n→ Categoria: 2\n→ Carga: 1"
+ },
+ {
+  "categoria": "Explosivos",
+  "nome": "Granada de Fumaça",
+  "cat": "2",
+  "carga": "1",
+  "desc": "→ Efeito: Produz uma fumaça espeça em um raio de 3-5m que dura 3 rodadas, cortando a linha de visão e deixando quaisquer ser em seu raio de efeito sob camuflagem total e com o status de Alheio. Após 1 rodada, o raio de efeito da fumaça aumenta para 10m.\n→ Distância: Curta\n→ Categoria: 2\n→ Carga: 1"
  },
  {
   "categoria": "Armas de Fogo",
@@ -507,13 +521,6 @@ export const EQUIPAMENTOS = [
   "cat": "1",
   "carga": "2",
   "desc": "→ 1d8 de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 1\n→ Carga: 2"
- },
- {
-  "categoria": "Armas Brancas",
-  "nome": "Baioneta",
-  "cat": "1",
-  "carga": "1",
-  "desc": "→ 1d6+(Força) de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 1\n→ Carga: 1"
  },
  {
   "categoria": "Proteção",
@@ -640,5 +647,96 @@ export const EQUIPAMENTOS = [
   "cat": "3",
   "carga": "",
   "desc": "→ Capacidade: 20 cargas\n→ Categoria: 3"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Silenciador",
+  "cat": "2",
+  "carga": "1",
+  "desc": "→ Efeito: Abafa consideravelmente o som de um disparo, diminuindo possíveis penalidades de Furtividade e dificultando a Percepção alheia.\n→ Categoria: 2\n→ Carga: 1"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Mira Laser",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: Aumenta sua Margem de Crítico em 1.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Mira Holográfica",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: Aprimora a ação de \"Mirar\" a curta/média distância, podendo realizá-la como uma ação livre.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Mira Telescópica",
+  "cat": "2",
+  "carga": "1",
+  "desc": "→ Efeito: Aprimora a ação de \"Mirar\" a média/longa distância, ganhando +1 dado de dano caso acerte o ataque.\n→ Categoria: 2\n→ Carga: 1"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Grip Frontal",
+  "cat": "1",
+  "carga": "0",
+  "desc": "→ Efeito: Diminui em 1, a desvantagem por disparos consecutivos, ajudando a controlar o recuo da arma (Ex: 2 desvantagens -> 1 desvantagem -> 0 desvantagens).\n→ Categoria: 1\n→ Carga: 0"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Calibre Maior",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: A arma é modificada para disparos de maior calibre, aumentando a categoria dos dados de dano em 1 (Ex: 2d6 de dano -> 2d8 de dano), alterando o tipo de munição que utiliza.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Modificações de Armas de Fogo",
+  "nome": "Baioneta",
+  "cat": "1",
+  "carga": "1",
+  "desc": "→ Efeito: Possui uma lâmina projetada para ser fixada em armas de fogo compatíveis, dando a opção de um combate corpo a corpo.\n→ Categoria: 1\n→ Carga: 1"
+ },
+ {
+  "categoria": "Melhorias de Armas Brancas",
+  "nome": "Peso Distribuído",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: Permite realizar um Ataque Extra utilizando uma Ação Rápida e diminui o valor de Carga em -1. mantendo um mínimo de 1.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Melhorias de Armas Brancas",
+  "nome": "Pegada Firme",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: Anula a penalidade de derrubar a arma ao tirar um Desastre e ganha vantagem em testes para resistir a ser desarmado.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Melhorias de Armas Brancas",
+  "nome": "Feita pra Mim",
+  "cat": "3",
+  "carga": "0",
+  "desc": "→ Efeito: Forjada para suas demandas, físico e estilo de combate, tem vantagem em suas ações ofensivas e para qualquer outro que a empunhar, tem desvantagem nas mesmas ações.\n→ Categoria: 3\n→ Carga: 0"
+ },
+ {
+  "categoria": "Melhorias de Armas Brancas",
+  "nome": "Barra Pesada",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: Quanto mais pesada, maior o estrago. Aumenta o valor de Carga em +1 e recebe um bônus de dano de +X, sendo X equivalente ao valor de Carga da arma.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Melhorias de Armas Brancas",
+  "nome": "Defensiva",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: Sua arma fornece vantagem em testes de Defender e permite que substitua um Ataque de Oportunidade por uma \"Defesa de Oportunidade\", garantindo um efeito de Absorção equivalente ao seu dado de Força.\n→ Categoria: 2\n→ Carga: 0"
+ },
+ {
+  "categoria": "Melhorias de Armas Brancas",
+  "nome": "Objeto de Tortura",
+  "cat": "2",
+  "carga": "0",
+  "desc": "→ Efeito: A arma é cruel, com modificações feitas para causar dor, aumentando seu dano +3 de dano físico e mental. Durante a cena, no início de seus turnos, suas vítimas podem realizar um teste de Vigor e um teste de Vontade de DT Bom para se \"acostumarem\", o que diminui o dano físico ou de sanidade em -1, até eventualmente zerar. Realizar um ataque bem sucedido com esta arma, em um alvo que ainda não se \"acostumou\", te causa 1 de dano mental.\n→ Categoria: 2\n→ Carga: 0"
  }
 ];

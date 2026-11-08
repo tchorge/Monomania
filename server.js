@@ -27,6 +27,7 @@ const load = (file) => {
 };
 const save = (file, obj) => fs.writeFileSync(file, JSON.stringify(obj, null, 2));
 
+const NPCS = load(path.join(__dirname, 'npcs.json'));
 let fichas = load(F_FICHAS);
 let users = load(F_USERS);
 let sessoes = load(F_SESS);
@@ -161,6 +162,12 @@ async function api(req, res, url) {
       return;
     }
 
+    // arquétipos e personalidades de NPC: dados exclusivos do mestre
+    if (recurso === 'npcs' && m === 'GET') {
+      if (!ehMestre(user)) return json(res, 403, { error: 'Somente o mestre.' });
+      return json(res, 200, NPCS);
+    }
+
     if (recurso === 'usuarios') {
       if (!ehMestre(user)) return json(res, 403, { error: 'Somente o mestre.' });
       if (m === 'GET' && !id)
@@ -191,6 +198,14 @@ async function api(req, res, url) {
         if (atual && !pode(user, atual)) return json(res, 403, { error: 'Sem permissão.' });
         const f = { ...body, id, owner: atual ? atual.owner : user.usuario, updatedAt: Date.now() };
         delete f.donoNome;
+        // só o mestre cria, renomeia ou remove contadores; jogadores apenas alteram os valores
+        if (!ehMestre(user)) {
+          const enviados = Array.isArray(body.contadores) ? body.contadores : [];
+          f.contadores = (atual && Array.isArray(atual.contadores) ? atual.contadores : []).map((c) => {
+            const novo = enviados.find((x) => x && x.id === c.id);
+            return novo ? { ...c, atual: Number(novo.atual) || 0 } : c;
+          });
+        }
         fichas[id] = f;
         save(F_FICHAS, fichas);
         emitir('ficha', comDono(f), cid, f);

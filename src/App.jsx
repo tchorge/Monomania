@@ -1,7 +1,72 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as api from './lib/storage.js';
-import { novaFicha, pvMaximo } from './data/rules.js';
+import { novaFicha, pvMaximo, PONTOS_PARTIDA } from './data/rules.js';
+import { MONOMANIAS_DETALHE } from './data/catalogo.js';
 import Sheet from './components/Sheet.jsx';
+
+// Gerador de NPC genérico (p.84–89): só o mestre vê; os dados vêm de /api/npcs, que o servidor restringe ao mestre
+function NpcGerador({ onCriar }) {
+  const [dados, setDados] = useState(null);
+  const [erro, setErro] = useState('');
+  const [arq, setArq] = useState('civil');
+  const [nivel, setNivel] = useState(0);
+  const [pers, setPers] = useState('aleatoria');
+  const [nome, setNome] = useState('');
+
+  useEffect(() => { api.npcs().then(setDados).catch((e) => setErro(e.message)); }, []);
+  if (erro) return <p className="alerta">{erro}</p>;
+  if (!dados) return null;
+
+  const criar = () => {
+    const a = dados.arquetipos.find((x) => x.id === arq);
+    const n = a.niveis[nivel];
+    const lista = dados.personalidades;
+    const p = pers === 'nenhuma' ? null : lista.find((x) => String(x.id) === pers) || lista[Math.floor(Math.random() * lista.length)];
+    const f = novaFicha();
+    f.nome = nome.trim() || `${a.nome} ${n.nome}`;
+    f.especiais = { ...n.especiais };
+    f.pericias = { ...n.pericias };
+    f.pontoPartida = nivel;
+    f.pv = { atual: n.vida, extra: Math.max(0, n.vida - pvMaximo(n.especiais.VIG)), nota: '' };
+    f.aparencia = `NPC genérico: ${a.nome} (${n.nome})${p ? ` · Personalidade: ${p.nome}` : ''}`;
+    f.monomanias = (p ? p.monomanias : []).flatMap((m) => {
+      for (const traco of Object.keys(MONOMANIAS_DETALHE)) {
+        const achada = MONOMANIAS_DETALHE[traco].find((x) => x.nome === m);
+        if (achada) return [{ traco, nome: achada.nome, desc: achada.desc }];
+      }
+      return [];
+    });
+    onCriar(f);
+    setNome('');
+  };
+
+  return (
+    <section className="card-s npc-ger">
+      <h2>Gerar NPC genérico</h2>
+      <div className="campos">
+        <label>Arquétipo
+          <select value={arq} onChange={(e) => setArq(e.target.value)}>
+            {dados.arquetipos.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
+          </select>
+        </label>
+        <label>Ponto de Partida
+          <select value={nivel} onChange={(e) => setNivel(Number(e.target.value))}>
+            {PONTOS_PARTIDA.map((p, i) => <option key={p} value={i}>{p}</option>)}
+          </select>
+        </label>
+        <label>Personalidade
+          <select value={pers} onChange={(e) => setPers(e.target.value)}>
+            <option value="aleatoria">Aleatória (1d6)</option>
+            <option value="nenhuma">Sem monomanias</option>
+            {dados.personalidades.map((p) => <option key={p.id} value={p.id}>{p.id}. {p.nome}</option>)}
+          </select>
+        </label>
+        <label>Nome (opcional)<input value={nome} onChange={(e) => setNome(e.target.value)} /></label>
+      </div>
+      <button onClick={criar}>+ Criar NPC</button>
+    </section>
+  );
+}
 
 function Login({ onLogin }) {
   const [semUsuarios, setSemUsuarios] = useState(false);
@@ -123,6 +188,10 @@ function Home({ user, fichas, conectado, onAbrir, onSair, recarregar }) {
     await api.salvar(f);
     onAbrir(f.id, { ...f, owner: user.usuario });
   };
+  const criarNpc = async (f) => {
+    await api.salvar(f);
+    onAbrir(f.id, { ...f, owner: user.usuario });
+  };
   const apagar = async (f) => {
     if (!confirm(`Excluir a ficha de ${f.nome || 'sem nome'}?`)) return;
     await api.excluir(f.id);
@@ -170,6 +239,7 @@ function Home({ user, fichas, conectado, onAbrir, onSair, recarregar }) {
       {mestre && aba === 'jogadores' && <Jogadores />}
       {(!mestre || aba === 'minhas') && (
         <>
+          {mestre && <NpcGerador onCriar={criarNpc} />}
           <div className="acoes">
             <button onClick={criar}>+ Nova ficha</button>
             <button className="sec" onClick={() => fileRef.current.click()}>Importar JSON</button>

@@ -127,6 +127,7 @@ export const novaFicha = () => ({
   ps: { atual: 100, nota: '' },
   pulsoes: { atual: 0, nota: '' },
   pp: { atual: 0, max: 0, nota: '' },
+  contadores: [],
   pontoPartida: 0,
   raio: 5,
   inventario: [],
