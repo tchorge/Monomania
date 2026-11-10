@@ -1,0 +1,67 @@
+TUTORIAL - COMO RODAR A FICHA MONOMANIA NO VSCODE (PASSO A PASSO)
+==================================================================
+
+PARTE 1 - INSTALAR O QUE FALTA (so na primeira vez)
+---------------------------------------------------
+1. Instale o Node.js (e necessario para rodar o site):
+   - Acesse https://nodejs.org
+   - Baixe a versao "LTS" (botao verde), execute o instalador e va clicando em "Next" ate o fim.
+   - Deixe todas as opcoes como estao.
+
+2. FECHE o VSCode completamente e abra de novo (para ele reconhecer o Node).
+
+PARTE 2 - ABRIR O PROJETO
+-------------------------
+3. Tenha certeza que o projeto está aberto no VSCode (se tu tem como ler isso tá aberto kkkkk)
+
+PARTE 3 - ABRIR O TERMINAL
+--------------------------
+4. No menu do VSCode: Terminal > Novo Terminal. Uma janela aparece na parte de baixo.
+
+5. Teste se o Node esta instalado, digitando e apertando Enter:
+
+       node -v
+
+   Deve aparecer um numero, como v20.11.0. Se der erro, refaca o passo 1 e 2.
+
+PARTE 4 - INSTALAR AS DEPENDENCIAS
+----------------------------------
+6. No terminal, digite e aperte Enter:
+
+       npm install
+
+   Espere terminar de instalar.
+
+PARTE 5 - RODAR O SITE
+----------------------
+7. Digite:
+
+       npm run serve
+
+   Aguarde aparecer no terminal a mensagem do servidor com os enderecos.
+8. Abra o navegador e acesse:
+
+       http://localhost:3000
+
+9. O PRIMEIRO usuario cadastrado vira o Mestre. Crie sua conta e use o site.
+
+Para ver da outra pessoa/celular/tablet na MESMA rede Wi-Fi: use o endereco de
+rede que aparece no terminal (algo como http://192.168.x.x:3000).
+
+PARTE 6 - PARAR E RODAR DE NOVO
+-------------------------------
+- Para parar o site: clique no terminal e aperte Ctrl + C.
+- Nas proximas vezes NAO precisa repetir o "npm install".
+  So abra a pasta no VSCode, abra o terminal e rode:  npm run serve
+- Se baixar uma atualizacao do projeto (git pull) e der erro, rode "npm install"
+  de novo e depois "npm run serve".
+
+PROBLEMAS COMUNS
+----------------
+- "npm nao e reconhecido como comando": Node.js nao instalado ou VSCode nao foi
+  reiniciado. Refaca os passos 1 e 2.
+- "Porta 3000 em uso / EADDRINUSE": ja existe outro servidor rodando. Feche os outros
+  terminais (icone da lixeira) e tente de novo.
+- Pagina em branco ou sem atualizar: rode "npm run serve" de novo
+  (ele reconstroi o site) e aperte Ctrl + F5 no navegador.
+- Os dados (fichas e contas) ficam salvos na pasta "data". Nao apague essa pasta.
