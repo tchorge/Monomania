@@ -246,6 +246,8 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
   const pvMax = pvMaximo(e.VIG) + num(f.pv.extra);
   const nivel = nivelPresenca(e.PRE, e.INT, e.VON);
   const cargaUsada = f.inventario.reduce((s, i) => s + cargaItem(i), 0);
+  const categoriaTotal = f.inventario.reduce((s, i) =>
+    s + num(i.cat) * (i.qtd ?? 1) + (i.melhorias || []).reduce((total, nome) => total + num(catalogo(nome)?.cat), 0), 0);
   const bonusCarga = f.inventario.reduce((s, i) => s + num(i.bonus), 0);
   const { corpo: capCorpo, total: capTotal, limite: capLimite } = capacidadeCarga(e.FOR, bonusCarga);
   const medo = medoAtual(f.ps.atual);
@@ -652,7 +654,7 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
 
         {aba === 'inv' && (
           <>
-            <Card titulo="Carga" sub={`${cargaUsada} / ${capTotal} · só corpo: ${capCorpo} · limite absoluto ${capLimite}`}>
+            <Card titulo="Carga" sub={`${cargaUsada} / ${capTotal} · só corpo: ${capCorpo} · limite absoluto ${capLimite} · Categoria total: ${categoriaTotal}`}>
               <div className={`barra grande ${cargaUsada > capTotal ? 'over' : ''}`}><i style={{ width: `${pct(cargaUsada, capTotal)}%` }} /></div>
               {cargaUsada > capTotal && <p className="alerta">{cargaUsada > capLimite ? 'Acima do limite absoluto (o dobro da capacidade)!' : 'Sobrecarregado: penalidades.'}</p>}
               {cargaUsada > capCorpo && bonusCarga === 0 && <p className="alerta">Acima do que cabe no corpo e bolsos ({capCorpo}). Adicione mochila, pochete ou similar.</p>}

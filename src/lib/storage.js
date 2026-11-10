@@ -1,5 +1,6 @@
 // Comunicação com o servidor (login por token, fichas e eventos ao vivo)
 const TK = 'monomania:token';
+localStorage.removeItem(TK);
 export const clientId = (() => {
   let c = sessionStorage.getItem('monomania:cid');
   if (!c) {
@@ -9,8 +10,8 @@ export const clientId = (() => {
   return c;
 })();
 
-export const getToken = () => localStorage.getItem(TK);
-export const setToken = (t) => (t ? localStorage.setItem(TK, t) : localStorage.removeItem(TK));
+export const getToken = () => sessionStorage.getItem(TK);
+export const setToken = (t) => (t ? sessionStorage.setItem(TK, t) : sessionStorage.removeItem(TK));
 
 let aoDeslogar = () => {};
 export const onDeslogar = (fn) => (aoDeslogar = fn);
@@ -38,7 +39,8 @@ export const registrar = (usuario, senha, nome) => post('/api/registrar', { usua
 export const eu = () => req('/api/eu');
 export const sair = () => post('/api/sair', {}).catch(() => {});
 export const usuarios = () => req('/api/usuarios');
-export const redefinirSenha = (u, senha) => post(`/api/usuarios/${u}/senha`, { senha });
+export const atualizarUsuario = (u, dados) =>
+  req(`/api/usuarios/${encodeURIComponent(u)}`, { method: 'PATCH', body: JSON.stringify(dados) });
 
 export const npcs = () => req('/api/npcs');
 

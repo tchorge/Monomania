@@ -110,11 +110,11 @@ setInterval(() => { for (const c of clientes) c.res.write(': ping\n\n'); }, 2500
 
 async function api(req, res, url) {
   const ip = req.socket.remoteAddress;
-  const rota = url.pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean);
-  const [recurso, id, sub] = rota;
-  const m = req.method;
-
   try {
+    const rota = url.pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
+    const [recurso, id, sub] = rota;
+    const m = req.method;
+
     if (recurso === 'estado' && m === 'GET') return json(res, 200, { semUsuarios: Object.keys(users).length === 0 });
 
     if ((recurso === 'registrar' || recurso === 'entrar') && m === 'POST') {
@@ -172,6 +172,31 @@ async function api(req, res, url) {
       if (!ehMestre(user)) return json(res, 403, { error: 'Somente o mestre.' });
       if (m === 'GET' && !id)
         return json(res, 200, Object.entries(users).map(([usuario, u]) => ({ usuario, nome: u.nome, papel: u.papel })));
+      if (m === 'PATCH' && id && !sub) {
+        const { usuario = '', senha = '' } = await readBody(req);
+        const chave = String(usuario).trim().toLowerCase();
+        const novaSenha = String(senha);
+        if (!users[id]) return json(res, 404, { error: 'Usuário não encontrado.' });
+        if (!USER_OK.test(chave)) return json(res, 400, { error: 'Usuário: 3 a 24 letras, números, _ . -' });
+        if (chave !== id && users[chave]) return json(res, 409, { error: 'Usuário já existe.' });
+        if (novaSenha && novaSenha.length < 4) return json(res, 400, { error: 'Senha com pelo menos 4 caracteres.' });
+
+        const atualizado = { ...users[id] };
+        if (novaSenha) {
+          Object.assign(atualizado, novoHash(novaSenha));
+          for (const t of Object.keys(sessoes)) if (sessoes[t].usuario === id && t !== token) delete sessoes[t];
+        }
+        users[chave] = atualizado;
+        if (chave !== id) {
+          delete users[id];
+          for (const ficha of Object.values(fichas)) if (ficha.owner === id) ficha.owner = chave;
+          for (const sessao of Object.values(sessoes)) if (sessao.usuario === id) sessao.usuario = chave;
+        }
+        save(F_USERS, users);
+        save(F_FICHAS, fichas);
+        save(F_SESS, sessoes);
+        return json(res, 200, { usuario: chave, nome: atualizado.nome, papel: atualizado.papel });
+      }
       if (m === 'POST' && id && sub === 'senha') {
         const { senha = '' } = await readBody(req);
         if (!users[id]) return json(res, 404, { error: 'Usuário não encontrado.' });

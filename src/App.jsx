@@ -156,27 +156,66 @@ function Cards({ lista, onAbrir, onApagar, vazio }) {
   );
 }
 
-function Jogadores() {
+function Jogadores({ user, onUsuarioAtualizado }) {
   const [lista, setLista] = useState([]);
-  useEffect(() => { api.usuarios().then(setLista).catch(() => {}); }, []);
-  const redef = async (u) => {
-    const s = prompt(`Nova senha para ${u.nome} (mín. 4 caracteres):`);
-    if (!s) return;
-    try { await api.redefinirSenha(u.usuario, s); alert('Senha alterada.'); } catch (e) { alert(e.message); }
+  const [editando, setEditando] = useState('');
+  const [usuario, setUsuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
+  const [busy, setBusy] = useState(false);
+  const carregar = () => api.usuarios().then(setLista).catch((e) => setErro(e.message));
+  useEffect(() => { carregar(); }, []);
+
+  const editar = (u) => {
+    setEditando(u.usuario);
+    setUsuario(u.usuario);
+    setSenha('');
+    setErro('');
+  };
+  const salvar = async (ev) => {
+    ev.preventDefault();
+    setBusy(true);
+    setErro('');
+    try {
+      const atualizado = await api.atualizarUsuario(editando, { usuario, senha });
+      if (editando === user.usuario) onUsuarioAtualizado(atualizado);
+      setEditando('');
+      setSenha('');
+      await carregar();
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <div className="cards">
+      {erro && !editando && <p className="alerta">{erro}</p>}
       {lista.map((u) => (
-        <div className="card" key={u.usuario}>
-          <div className="card-main"><strong>{u.nome}</strong><span>{u.usuario} · {u.papel}</span></div>
-          {u.papel !== 'mestre' && <button className="sec" onClick={() => redef(u)}>Redefinir senha</button>}
-        </div>
+        <article className="card conta-card" key={u.usuario}>
+          <div className="conta-info"><strong>{u.nome}</strong><span>{u.usuario} · {u.papel}</span></div>
+          {editando === u.usuario ? (
+            <form className="conta-edicao" onSubmit={salvar}>
+              <div className="campos">
+                <label>Usuário<input value={usuario} autoCapitalize="none" autoComplete="username" onChange={(e) => setUsuario(e.target.value)} /></label>
+                <label>Nova senha (opcional)<input type="password" autoComplete="new-password" value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Deixe vazio para manter" /></label>
+              </div>
+              {erro && <p className="alerta">{erro}</p>}
+              <div className="linha">
+                <button disabled={busy}>{busy ? 'Salvando…' : 'Salvar alterações'}</button>
+                <button type="button" className="sec" onClick={() => { setEditando(''); setErro(''); }}>Cancelar</button>
+              </div>
+            </form>
+          ) : (
+            <button className="sec" onClick={() => editar(u)}>Editar usuário e senha</button>
+          )}
+        </article>
       ))}
     </div>
   );
 }
 
-function Home({ user, fichas, conectado, onAbrir, onSair, recarregar }) {
+function Home({ user, fichas, conectado, onAbrir, onSair, recarregar, onUsuarioAtualizado }) {
   const [aba, setAba] = useState('mesa');
   const fileRef = useRef();
   const mestre = user.papel === 'mestre';
@@ -236,7 +275,7 @@ function Home({ user, fichas, conectado, onAbrir, onSair, recarregar }) {
           <Cards lista={mesa} onAbrir={onAbrir} onApagar={apagar} vazio="Nenhum jogador criou ficha ainda." />
         </>
       )}
-      {mestre && aba === 'jogadores' && <Jogadores />}
+      {mestre && aba === 'jogadores' && <Jogadores user={user} onUsuarioAtualizado={onUsuarioAtualizado} />}
       {(!mestre || aba === 'minhas') && (
         <>
           {mestre && <NpcGerador onCriar={criarNpc} />}
@@ -315,6 +354,7 @@ export default function App() {
       fichas={ordenadas}
       conectado={conectado}
       recarregar={recarregar}
+      onUsuarioAtualizado={setUser}
       onAbrir={async (id, f) => setAberta(f || (await api.carregar(id)))}
       onSair={async () => {
         await api.sair();
