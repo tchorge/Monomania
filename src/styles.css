@@ -157,6 +157,14 @@ label input, label textarea, label select { text-transform: none; letter-spacing
 .vit-a { margin-left: 10px; font-size: .68rem; color: var(--acc2); text-transform: uppercase; letter-spacing: .08em; }
 .vit > .par:not(.mini) { grid-column: 2; grid-row: 2; align-self: center; }
 .vit > .par.mini { grid-column: 2; grid-row: 3; margin-top: 6px; }
+.estado-morto, .estado-morrendo { display: block; grid-column: 1 / -1; margin: 4px 0; font-size: .76rem; font-weight: 800; letter-spacing: .12em; text-align: center; }
+.estado-morto { color: #ff5964; }
+.estado-morrendo { color: #ffb347; }
+.mini-bar + .estado-morto, .mini-bar + .estado-morrendo { text-align: left; }
+.vit .estado-morto { align-self: center; }
+.estado-morte-acoes { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.estado-morte-acoes .estado-morto { margin: 0; }
+.estado-morte-acoes button { width: 100%; }
 .vit-ed { grid-column: 1 / -1; display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 4px; }
 .vit-ed input { flex: 1; min-width: 0; padding: 6px 10px; font-size: .8rem; }
 .vit-ed .x { min-height: 28px; padding: 2px 8px; font-size: .72rem; }
@@ -232,7 +240,8 @@ label input, label textarea, label select { text-transform: none; letter-spacing
 .segmento button { background: transparent; color: var(--mut); min-height: 34px; padding: 4px 12px; font-size: .82rem; }
 .segmento button:hover { background: transparent; color: var(--fg); }
 .segmento button.ativa { background: var(--s3); color: var(--fg); }
-.fx-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); column-gap: 44px; }
+.fx-lista { display: block; }
+.fx-lista .ln { break-inside: avoid; }
 .fx-lista .ln-n b { font-size: 1rem; font-weight: 400; letter-spacing: .02em; }
 
 /* ===== Stepper (campos de formulário) ===== */
@@ -331,6 +340,12 @@ input[type=range] { padding: 0; height: 32px; accent-color: var(--fg); backgroun
 .colap-c { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px; }
 .campos.mini.tres { grid-template-columns: repeat(3, 1fr); }
 .melhorias { display: flex; flex-direction: column; gap: 6px; }
+.mono-select { position: relative; flex: 1; min-width: 0; }
+.mono-opcoes { position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; right: 0; max-height: min(260px, 50vh); overflow-y: auto; display: flex; flex-direction: column; padding: 4px; background: var(--s2); border: 1px solid var(--line2); border-radius: 10px; box-shadow: 0 12px 28px rgba(0, 0, 0, .65); }
+.mono-opcoes button { min-height: 38px; padding: 8px 10px; background: transparent; color: var(--fg); border: none; text-align: left; font-weight: 400; }
+.mono-opcoes button:hover, .mono-opcoes button[aria-selected="true"] { background: var(--s3); }
+.mono-sem-opcoes { padding: 8px 10px; color: var(--mut); font-size: .82rem; }
+.lesao-grave { justify-content: space-between; color: var(--acc2); }
 .melhoria { border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px; }
 .melhoria summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; font-size: .88rem; }
 .melhoria .desc { margin: 6px 0; }
@@ -362,6 +377,10 @@ input[type=range] { padding: 0; height: 32px; accent-color: var(--fg); backgroun
   .fx-grade { grid-template-columns: minmax(0, 1fr) minmax(96px, 32%); }
 }
 
+@media (min-width: 720px) {
+  .fx-lista { columns: 2; column-gap: 44px; }
+}
+
 /* tablet e acima: atributos | vitais | personagem lado a lado */
 @media (min-width: 720px) {
   .topbar { padding-top: 0; }
@@ -386,11 +405,9 @@ input[type=range] { padding: 0; height: 32px; accent-color: var(--fg); backgroun
   .vit { padding: 12px 0; }
   .vit-v { font-size: 3.8rem; }
   .vit-r { font-size: .78rem; }
-  .fx-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 64px; }
 }
 @media (min-width: 1500px) {
   .conteudo { max-width: 1360px; }
-  .fx-lista { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* celular deitado */

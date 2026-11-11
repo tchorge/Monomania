@@ -126,6 +126,8 @@ const Mini = ({ f }) => {
   const ps = f.ps?.atual ?? 0;
   return (
     <>
+      {f.pv?.morto && <strong className="estado-morto">MORTO</strong>}
+      {!f.pv?.morto && pv <= 0 && <strong className="estado-morrendo">MORRENDO</strong>}
       <div className="mini-bar"><i style={{ width: `${Math.max(0, Math.min(100, (pv / max) * 100))}%`, background: '#b3202a' }} /><span>PV {pv}/{max}</span></div>
       <div className="mini-bar"><i style={{ width: `${Math.max(0, Math.min(100, ps))}%`, background: '#3b6fb3' }} /><span>PS {ps}%</span></div>
       <small>Pulsões: {f.pulsoes?.atual ?? 0}{f.condicoes?.length ? ` · ${f.condicoes.join(', ')}` : ''}</small>

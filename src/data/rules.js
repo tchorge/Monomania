@@ -123,7 +123,7 @@ export const novaFicha = () => ({
   especiais: { AGI: 1, FOR: 1, INT: 1, PRE: 1, VIG: 1, VON: 1 },
   pericias: Object.fromEntries(PERICIAS.map((p) => [p, 1])),
   monomanias: [],
-  pv: { atual: 15, extra: 0, nota: '' },
+  pv: { atual: 15, extra: 0, nota: '', lesaoGrave: false, morto: false, vidaAntesMorte: null },
   ps: { atual: 100, nota: '' },
   pulsoes: { atual: 0, nota: '' },
   pp: { atual: 0, max: 0, nota: '' },

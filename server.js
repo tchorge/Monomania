@@ -223,13 +223,17 @@ async function api(req, res, url) {
         if (atual && !pode(user, atual)) return json(res, 403, { error: 'Sem permissão.' });
         const f = { ...body, id, owner: atual ? atual.owner : user.usuario, updatedAt: Date.now() };
         delete f.donoNome;
-        // só o mestre cria, renomeia ou remove contadores; jogadores apenas alteram os valores
+        // Jogadores podem gerenciar contadores extras da própria ficha, mas não de outras fichas.
         if (!ehMestre(user)) {
-          const enviados = Array.isArray(body.contadores) ? body.contadores : [];
-          f.contadores = (atual && Array.isArray(atual.contadores) ? atual.contadores : []).map((c) => {
-            const novo = enviados.find((x) => x && x.id === c.id);
-            return novo ? { ...c, atual: Number(novo.atual) || 0 } : c;
-          });
+          if (!Array.isArray(body.contadores)) {
+            f.contadores = atual && Array.isArray(atual.contadores) ? atual.contadores : [];
+          } else {
+            f.contadores = body.contadores.filter((c) => c && ID_OK.test(String(c.id || ''))).map((c) => ({
+              id: String(c.id),
+              nome: String(c.nome || 'Contador').slice(0, 30),
+              atual: Math.max(0, Number(c.atual) || 0),
+            }));
+          }
         }
         fichas[id] = f;
         save(F_FICHAS, fichas);

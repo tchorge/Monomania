@@ -98,14 +98,14 @@ function Linha({ nome, sub, valor, onChange, onRolar, destaque }) {
   );
 }
 
-function Vit({ rotulo, valor, max, aviso, onMais, onMenos, extra }) {
+function Vit({ rotulo, valor, max, aviso, onMais, onMenos, extra, desabilitado = false }) {
   return (
     <div className={`vit ${extra ? 'com-extra' : ''}`}>
       <div className="vit-r">{rotulo}{aviso && <span className="vit-a">{aviso}</span>}</div>
       <div className="vit-v">{valor}{max != null && <small>/{max}</small>}</div>
       <div className="par">
-        <Rb onClick={onMenos} aria-label={`Diminuir ${rotulo}`}>−</Rb>
-        <Rb onClick={onMais} aria-label={`Aumentar ${rotulo}`}>+</Rb>
+        <Rb onClick={onMenos} disabled={desabilitado} aria-label={`Diminuir ${rotulo}`}>−</Rb>
+        <Rb onClick={onMais} disabled={desabilitado} aria-label={`Aumentar ${rotulo}`}>+</Rb>
       </div>
       {extra}
     </div>
@@ -269,7 +269,7 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
   const listaPericias = useMemo(() => {
     const b = busca.trim().toLowerCase();
     return PERICIAS.filter((p) => p.toLowerCase().includes(b)).sort((a, c) =>
-      ordem === 'valor' ? f.pericias[c] - f.pericias[a] || a.localeCompare(c) : a.localeCompare(c));
+      ordem === 'valor' ? f.pericias[c] - f.pericias[a] || a.localeCompare(c, 'pt-BR') : a.localeCompare(c, 'pt-BR'));
   }, [busca, ordem, f.pericias]);
 
   const mostrar = (r) => {
@@ -363,22 +363,46 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
 
   const aplicarDano = () => {
     const d = num(danoPv, 0, 999);
-    if (!d) return;
+    if (!d || f.pv.morto) return;
     const tipo = d >= pvMax ? 'Fatal' : d >= pvMax / 2 ? 'Grave' : 'Comum';
     const novo = f.pv.atual - d;
+    const lesaoGrave = Boolean(f.pv.lesaoGrave) || tipo === 'Grave';
+    const morreu = tipo === 'Fatal' || (novo <= 0 && lesaoGrave);
     const avisos = [`Lesão ${tipo}: dano ${d} contra vida máxima ${pvMax}.`];
     if (tipo === 'Fatal') avisos.push('Dano igual ou superior à vida máxima: morte imediata.');
-    else if (tipo === 'Grave' && novo <= 0) avisos.push('Estado de Morrendo com Lesão Grave: morte imediata.');
+    else if (novo <= 0 && lesaoGrave) avisos.push('Estado de Morrendo com Lesão Grave: morte imediata.');
     else if (tipo === 'Grave') avisos.push('Lesão Grave: se entrar no Estado de Morrendo com ela, a morte é imediata. Estabilizar cura apenas 1 PV.');
-    if (tipo !== 'Fatal' && novo <= 0 && tipo !== 'Grave') avisos.push('Estado de Morrendo: ganha 1 Rodada de Imunidade; depois, testes de Vigor para continuar vivo até voltar a 1 PV.');
-    else if (novo >= 1 && novo <= 3) avisos.push('PV entre 1 e 3: desmaio instantâneo. Teste de Vigor até obter sucesso para voltar à consciência (crítico: Ação Livre).');
+    if (!morreu && novo <= 0) {
+      avisos.push(f.pv.atual > 0
+        ? 'Estado de Morrendo: ganha 1 Rodada de Imunidade; depois, testes de Vigor para continuar vivo até voltar a 1 PV.'
+        : 'Continua no Estado de Morrendo; faça testes de Vigor para continuar vivo até voltar a 1 PV.');
+    }
+    else if (!morreu && novo >= 1 && novo <= 3) avisos.push('PV entre 1 e 3: desmaio instantâneo. Teste de Vigor até obter sucesso para voltar à consciência (crítico: Ação Livre).');
     setAvisoLesao(avisos.join('\n'));
-    setF((o) => ({ ...o, pv: { ...o.pv, atual: o.pv.atual - d } }));
+    setF((o) => ({ ...o, pv: {
+      ...o.pv,
+      atual: o.pv.atual - d,
+      lesaoGrave: Boolean(o.pv.lesaoGrave) || tipo === 'Grave',
+      morto: Boolean(o.pv.morto) || morreu,
+      vidaAntesMorte: morreu ? o.pv.atual : o.pv.vidaAntesMorte,
+    } }));
     setDanoPv(0);
+  };
+  const reverterMorte = () => {
+    setF((o) => ({
+      ...o,
+      pv: {
+        ...o.pv,
+        atual: Math.min(pvMax, Math.max(1, Number(o.pv.vidaAntesMorte) || o.pv.atual)),
+        morto: false,
+        vidaAntesMorte: null,
+      },
+    }));
+    setAvisoLesao(null);
   };
   const aplicarCura = () => {
     const c = num(danoPv, 0, 999);
-    if (!c) return;
+    if (!c || f.pv.morto) return;
     setAvisoLesao(null);
     setF((o) => ({ ...o, pv: { ...o.pv, atual: Math.min(pvMax, o.pv.atual + c) } }));
     setDanoPv(0);
@@ -421,8 +445,23 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
   const toggleCond = (c) =>
     set('condicoes', f.condicoes.includes(c) ? f.condicoes.filter((x) => x !== c) : [...f.condicoes, c]);
 
-  const pvAlerta = f.pv.atual <= 0 ? 'Morrendo' : f.pv.atual <= 3 ? 'Risco de desmaio' : null;
-  const mudaPV = (d) => setF((o) => ({ ...o, pv: { ...o.pv, atual: Math.min(pvMax, o.pv.atual + d) } }));
+  const pvAlerta = f.pv.morto ? 'Morto' : f.pv.atual <= 0 ? 'Morrendo' : f.pv.atual <= 3 ? 'Risco de desmaio' : null;
+  const mudaPV = (d) => {
+    if (f.pv.morto) return;
+    setF((o) => {
+      const atual = Math.min(pvMax, o.pv.atual + d);
+      const morreu = d < 0 && atual <= 0 && Boolean(o.pv.lesaoGrave);
+      return {
+        ...o,
+        pv: {
+          ...o.pv,
+          atual,
+          morto: Boolean(o.pv.morto) || morreu,
+          vidaAntesMorte: morreu ? o.pv.atual : o.pv.vidaAntesMorte,
+        },
+      };
+    });
+  };
   const mudaPS = (d) => setF((o) => ({ ...o, ps: { ...o.ps, atual: num(o.ps.atual + d, 0, 100) } }));
   const mudaPU = (d) => setF((o) => ({ ...o, pulsoes: { ...o.pulsoes, atual: Math.max(0, o.pulsoes.atual + d) } }));
   const mudaPP = (d) => setF((o) => {
@@ -502,23 +541,23 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
               </div>
 
               <div className="fx-vit">
-                <Vit rotulo="PV" valor={f.pv.atual} max={pvMax} aviso={pvAlerta} onMais={() => mudaPV(1)} onMenos={() => mudaPV(-1)} />
+                <Vit rotulo="PV" valor={f.pv.atual} max={pvMax} aviso={pvAlerta} onMais={() => mudaPV(1)} onMenos={() => mudaPV(-1)}
+                  extra={f.pv.morto && <strong className="estado-morto">PERSONAGEM MORTO</strong>} desabilitado={f.pv.morto} />
                 <Vit rotulo="PS" valor={`${f.ps.atual}%`} aviso={medo && `Medo ${medo.nivel}`} onMais={() => mudaPS(1)} onMenos={() => mudaPS(-1)} />
                 <Vit rotulo="PU" valor={f.pulsoes.atual} onMais={() => mudaPU(1)} onMenos={() => mudaPU(-1)} />
                 <Vit rotulo="PP" valor={f.pp.atual} max={f.pp.max || null} onMais={() => mudaPP(1)} onMenos={() => mudaPP(-1)} />
                 {contadores.map((c) => (
                   <Vit key={c.id} rotulo={c.nome} valor={c.atual}
                     onMais={() => mudaContador(c.id, 1)} onMenos={() => mudaContador(c.id, -1)}
-                    extra={mestre && (
+                    extra={
                       <div className="vit-ed">
                         <input value={c.nome} aria-label="Nome do contador" onChange={(ev) => renomearContador(c.id, ev.target.value)} />
                         <button className="x" onClick={() => removerContador(c.id)} aria-label={`Remover ${c.nome}`}>✕</button>
                       </div>
-                    )} />
+                    } />
                 ))}
-                {mestre && (
-                  <button className="sec vit-add" onClick={novoContador} aria-label="Adicionar contador">+ Contador</button>
-                )}              </div>
+                <button className="sec vit-add" onClick={novoContador} aria-label="Adicionar contador">+ Contador</button>
+              </div>
 
               <aside className="fx-ret">
                 <label className="fx-foto" title="Trocar imagem">
@@ -659,7 +698,7 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
               {cargaUsada > capTotal && <p className="alerta">{cargaUsada > capLimite ? 'Acima do limite absoluto (o dobro da capacidade)!' : 'Sobrecarregado: penalidades.'}</p>}
               {cargaUsada > capCorpo && bonusCarga === 0 && <p className="alerta">Acima do que cabe no corpo e bolsos ({capCorpo}). Adicione mochila, pochete ou similar.</p>}
               <EquipAdd onAdd={adicionarItem} />
-              <button className="sec" onClick={() => set('inventario', [...f.inventario, { nome: '', cat: '', carga: '' }])}>+ Item em branco</button>
+              <button className="sec" onClick={() => set('inventario', [...f.inventario, { nome: '', cat: '', carga: '', anotacao: '' }])}>+ Item em branco</button>
             </Card>
             {f.inventario.map((it, i) => (
               <article className="item-card" key={i}>
@@ -675,6 +714,8 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
                   )}
                 </div>
                 {it.desc && <pre className="desc">{it.desc}</pre>}
+                <textarea rows="2" placeholder="Anotação do item (opcional)" aria-label={`Anotação de ${it.nome || 'item'}`}
+                  value={it.anotacao || ''} onChange={(ev) => updItem(i, { anotacao: ev.target.value })} />
                 {grupoMelhorias(it) && (
                   <Melhorias grupo={grupoMelhorias(it)} atuais={it.melhorias || []}
                     onAdd={(n) => addMelhoria(i, n)} onDel={(n) => delMelhoria(i, n)} />
@@ -720,11 +761,39 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
             </Colapsavel>
 
             <Colapsavel id="c-pv" titulo="Dano e cura" sub={`PV ${f.pv.atual}/${pvMax}`}>
+              {f.pv.morto ? (
+                <div className="estado-morte-acoes" role="status">
+                  <p className="estado-morto">PERSONAGEM MORTO — a ficha permanece registrada.</p>
+                  <button className="sec" onClick={reverterMorte}>Reverter morte</button>
+                </div>
+              ) : f.pv.atual <= 0 ? (
+                <>
+                  <p className="estado-morrendo" role="status">ESTADO DE MORRENDO</p>
+                  <p className="nota">Se falhar no teste de Vigor, registre a morte abaixo. A Rodada de Imunidade não substitui esse teste.</p>
+                  <button className="sec" onClick={() => {
+                    setF((o) => ({ ...o, pv: {
+                      ...o.pv,
+                      morto: true,
+                      vidaAntesMorte: o.pv.atual,
+                    } }));
+                    setAvisoLesao('Morte registrada após falha no teste de Vigor.');
+                  }}>Registrar morte (falha no teste de Vigor)</button>
+                </>
+              ) : null}
               <div className="linha">
                 <Stepper valor={danoPv} max={999} onChange={setDanoPv} />
-                <button onClick={aplicarDano}>Dano</button>
-                <button className="sec" onClick={aplicarCura}>Cura</button>
+                <button onClick={aplicarDano} disabled={f.pv.morto}>Dano</button>
+                <button className="sec" onClick={aplicarCura} disabled={f.pv.morto}>Cura</button>
               </div>
+              {f.pv.lesaoGrave && (
+                <div className="linha lesao-grave">
+                  <span>Lesão grave ativa</span>
+                  <button className="sec" disabled={f.pv.atual <= 0 || f.pv.morto} onClick={() => {
+                    setIn('pv', 'lesaoGrave', false);
+                    setAvisoLesao(null);
+                  }}>Marcar como tratada</button>
+                </div>
+              )}
               {avisoLesao && <p className="alerta" style={{ whiteSpace: 'pre-line' }}>{avisoLesao}</p>}
             </Colapsavel>
 
@@ -873,25 +942,69 @@ function Regras() {
 function MonoAdd({ onAdd }) {
   const [traco, setTraco] = useState('PER');
   const [nome, setNome] = useState('');
+  const [sugestoesAbertas, setSugestoesAbertas] = useState(false);
+  const [indiceSugestao, setIndiceSugestao] = useState(0);
+  const sugestoes = MONOMANIAS_DETALHE[traco].filter((m) =>
+    m.nome.toLowerCase().includes(nome.trim().toLowerCase()));
   const add = () => {
     const n = nome.trim();
     if (!n) return;
     const achada = MONOMANIAS_DETALHE[traco].find((m) => m.nome.toLowerCase() === n.toLowerCase());
     onAdd(traco, achada ? achada.nome : n, achada ? achada.desc : '');
     setNome('');
+    setSugestoesAbertas(false);
+  };
+  const escolher = (n) => {
+    setNome(n);
+    setSugestoesAbertas(false);
   };
   return (
     <div className="add-linha">
       <div className="tracos">
         {TRACOS.map((t) => (
           <button key={t.key} className={traco === t.key ? 'ativa' : ''} style={{ '--cor': COR_TRACO[t.key] }}
-            onClick={() => { setTraco(t.key); setNome(''); }}>{t.nome}</button>
+            onClick={() => { setTraco(t.key); setNome(''); setIndiceSugestao(0); setSugestoesAbertas(false); }}>{t.nome}</button>
         ))}
       </div>
       <p className="nota" style={{ borderColor: COR_TRACO[traco] }}>{DESC_TRACOS[traco]}</p>
       <div className="linha">
-        <input list="monos" placeholder="Escolha ou digite" value={nome} onChange={(ev) => setNome(ev.target.value)} />
-        <datalist id="monos">{MONOMANIAS_DETALHE[traco].map((m) => <option key={m.nome} value={m.nome} />)}</datalist>
+        <div className="mono-select">
+          <input role="combobox" aria-autocomplete="list" aria-expanded={sugestoesAbertas}
+            aria-controls="monomanias-opcoes"
+            aria-activedescendant={sugestoesAbertas && sugestoes[indiceSugestao]
+              ? `monomania-${traco}-${MONOMANIAS_DETALHE[traco].indexOf(sugestoes[indiceSugestao])}` : undefined}
+            placeholder="Escolha ou digite" value={nome}
+            onFocus={() => setSugestoesAbertas(true)}
+            onBlur={() => setSugestoesAbertas(false)}
+            onChange={(ev) => { setNome(ev.target.value); setIndiceSugestao(0); setSugestoesAbertas(true); }}
+            onKeyDown={(ev) => {
+              if (ev.key === 'Escape') setSugestoesAbertas(false);
+              if (ev.key === 'ArrowDown' && sugestoes.length) {
+                ev.preventDefault();
+                setSugestoesAbertas(true);
+                setIndiceSugestao((i) => (i + 1) % sugestoes.length);
+              }
+              if (ev.key === 'ArrowUp' && sugestoes.length) {
+                ev.preventDefault();
+                setSugestoesAbertas(true);
+                setIndiceSugestao((i) => (i - 1 + sugestoes.length) % sugestoes.length);
+              }
+              if (ev.key === 'Enter' && sugestoesAbertas && sugestoes[indiceSugestao]) {
+                ev.preventDefault();
+                escolher(sugestoes[indiceSugestao].nome);
+              }
+            }} />
+          {sugestoesAbertas && (
+            <div id="monomanias-opcoes" className="mono-opcoes" role="listbox">
+              {sugestoes.map((m) => (
+                <button type="button" role="option" id={`monomania-${traco}-${MONOMANIAS_DETALHE[traco].indexOf(m)}`}
+                  aria-selected={indiceSugestao === sugestoes.indexOf(m)} tabIndex={-1} key={m.nome}
+                  onMouseDown={(ev) => ev.preventDefault()} onClick={() => escolher(m.nome)}>{m.nome}</button>
+              ))}
+              {!sugestoes.length && <span className="mono-sem-opcoes">Nenhuma sugestão encontrada.</span>}
+            </div>
+          )}
+        </div>
         <button onClick={add}>+ Adicionar</button>
       </div>
     </div>
