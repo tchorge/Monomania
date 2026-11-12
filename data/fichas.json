@@ -429,5 +429,113 @@
     "owner": "bewlla",
     "updatedAt": 1794343940250,
     "contadores": []
+  },
+  "1794456332239": {
+    "id": "1794456332239",
+    "nome": "-",
+    "idade": "25",
+    "alturaPeso": "1.65m / 55kg ",
+    "campanha": "Grunts",
+    "jogador": "Isabella",
+    "aparencia": "",
+    "foto": "",
+    "especiais": {
+      "AGI": 13,
+      "FOR": 10,
+      "INT": 11,
+      "PRE": 12,
+      "VIG": 10,
+      "VON": 15
+    },
+    "pericias": {
+      "Acalmar": 8,
+      "Analisar": 10,
+      "Atualidades": 6,
+      "Atletismo": 8,
+      "Burocracia": 4,
+      "C. Exatas": 6,
+      "C. Humanas": 5,
+      "C. Naturais": 10,
+      "Defender": 9,
+      "Destreza": 9,
+      "Diplomacia": 8,
+      "Furtividade": 11,
+      "Intimidação": 7,
+      "Lutar": 11,
+      "Malandragem": 9,
+      "Medicina": 13,
+      "Memória": 7,
+      "Ocultismo": 5,
+      "Percepção": 12,
+      "Pesquisar": 5,
+      "Pilotagem": 6,
+      "Pontaria": 14,
+      "Preparação": 10,
+      "Religião": 4,
+      "Sobrevivência": 11,
+      "Tática": 8,
+      "Tecnologia": 7,
+      "Uso de Arma Branca": 11,
+      "Uso de Arma de Fogo": 12,
+      "Vasculhar": 9
+    },
+    "monomanias": [
+      {
+        "traco": "DET",
+        "nome": "Instinto de Sobrevivência",
+        "desc": "→ Uma vez por cena, quando atingir metade dos seus Pontos de Vida atuais, ganha 1 Pulsão e +1 uso de uma de suas monomanias."
+      },
+      {
+        "traco": "AUD",
+        "nome": "Jogada Arriscada",
+        "desc": "→ Durante uma disputa de dados, quando houver um empate, pode aceitar o fracasso para ganhar 1 Ponto de Pacto."
+      },
+      {
+        "traco": "PER",
+        "nome": "Impulso Ágil",
+        "desc": "→ Você tem 1 Ação Rápida como uma Ação Adicional durante seus turnos."
+      },
+      {
+        "traco": "DET",
+        "nome": "Muito Jovem para Morrer",
+        "desc": "→ Uma vez por cena, quando tomar um dano que fosse reduzir sua vida a 0 ou negativo, fique com 1 Ponto de Vida."
+      },
+      {
+        "traco": "RAC",
+        "nome": "Racionalização",
+        "desc": "→ No início de cada cena, escolha um dos seguintes efeitos: 1- Ganha o status de Concentrado até fracassar. 2- Sempre que for alvo de uma monomania, ganha 1 Ponto de Pacto. 3- Até o fim da cena, todo dano mental é reduzido em X, sendo X o valor correspondente ao número de monomanias de Raciocínio que possui."
+      }
+    ],
+    "pv": {
+      "atual": 18,
+      "extra": 0,
+      "nota": "",
+      "lesaoGrave": false,
+      "morto": false,
+      "vidaAntesMorte": null
+    },
+    "ps": {
+      "atual": 100,
+      "nota": ""
+    },
+    "pulsoes": {
+      "atual": 0,
+      "nota": ""
+    },
+    "pp": {
+      "atual": 0,
+      "max": 0,
+      "nota": ""
+    },
+    "contadores": [],
+    "pontoPartida": 3,
+    "raio": 5,
+    "inventario": [],
+    "status": {},
+    "condicoes": [],
+    "combate": "",
+    "anotacoes": "",
+    "owner": "bewlla",
+    "updatedAt": 1794460035449
   }
 }
