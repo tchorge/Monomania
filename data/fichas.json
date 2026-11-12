@@ -21,10 +21,10 @@
       "Analisar": 8,
       "Atualidades": 8,
       "Atletismo": 11,
-      "Burocracia": 5,
-      "C. Exatas": 5,
+      "Burocracia": 4,
+      "C. Exatas": 4,
       "C. Humanas": 6,
-      "C. Naturais": 7,
+      "C. Naturais": 5,
       "Defender": 11,
       "Destreza": 10,
       "Diplomacia": 5,
@@ -34,13 +34,13 @@
       "Malandragem": 7,
       "Medicina": 9,
       "Memória": 8,
-      "Ocultismo": 4,
+      "Ocultismo": 5,
       "Percepção": 11,
       "Pesquisar": 6,
       "Pilotagem": 9,
       "Pontaria": 8,
       "Preparação": 11,
-      "Religião": 4,
+      "Religião": 7,
       "Sobrevivência": 10,
       "Tática": 10,
       "Tecnologia": 7,
@@ -75,9 +75,9 @@
         "desc": "→ Uma vez por cena, quando tomar um dano que fosse reduzir sua vida a 0 ou negativo, fique com 1 Ponto de Vida."
       },
       {
-        "traco": "DET",
-        "nome": "Golpe Cirúrgico",
-        "desc": "→ Quando der um ataque bem-sucedido, pode fazer um Pacto Mental para então ganhar +1 dado de dano."
+        "traco": "PER",
+        "nome": "Dois em Um",
+        "desc": "→ Uma vez por cena, ganha um +1 Ação Ofensiva."
       }
     ],
     "pv": {
@@ -173,7 +173,7 @@
     "combate": "",
     "anotacoes": "🩸 MUTAÇÃO: BERSERK!\n\nSede de Sangue (Sustentável — Custo: 1 PN/turno):\nCada ataque bem-sucedido que você acertar (tiro ou corte) ou receber, ganha 1 Ponto de Sangue (dura até o fim da cena e substitui Pontos de Numen sem subir sua Taxa Numênica).\n\nLei do Mais Forte (Manifestável — Custo: 3 PN / 3 Pontos de Sangue):\nAo causar dano, drene o sangue do alvo para:\nRegenerar 1d6 PV; OU\nGanhar 1d6 Pontos de Sangue; OU\n+1 dado de dano no próximo ataque.\n\nFúria Implacável (Sustentável — Custo: 4 PN / 4 Pontos de Sangue por turno):\nNo início de cada um dos seus turnos: ganha +1 Ação Ofensiva e reativa todas as monomanias de ataque (Encaçapado! reseta todo turno). Fica com o status Cabisbaixo (-1 em testes de Vontade).",
     "owner": "george",
-    "updatedAt": 1794366178985,
+    "updatedAt": 1794442801838,
     "contadores": [
       {
         "id": "7e95cc5c-83d5-4c98-b6a6-e2027264c4ac",
