@@ -496,11 +496,6 @@
         "desc": "→ No primeiro turno que atacar um ou mais alvos durante uma cena, tem vantagem em todos os dados."
       },
       {
-        "traco": "AUD",
-        "nome": "Quem é a Ameaça Aqui?",
-        "desc": "→ Durante uma cena de combate e uma vez por alvo, após o ferir pela primeira vez, ganha 1 Pulsão no próximo ataque contra ele."
-      },
-      {
         "traco": "RAC",
         "nome": "Paciência",
         "desc": "→ Você pode passar seu turno para no próximo ter +1 Ação e um status a sua escolha."
@@ -509,6 +504,11 @@
         "traco": "PER",
         "nome": "Impulso Ágil",
         "desc": "→ Você tem 1 Ação Rápida como uma Ação Adicional durante seus turnos."
+      },
+      {
+        "traco": "AUD",
+        "nome": "Aposta Mortal",
+        "desc": "→ Uma vez por cena, durante uma disputa de dados, ao realizar um teste contra o seu alvo, ganha 1 Pulsão para usar nesse teste, porém, se falhar, o seu alvo ganha 1 Pulsão."
       }
     ],
     "pv": {
@@ -663,7 +663,7 @@
     "combate": "",
     "anotacoes": "",
     "owner": "bewlla",
-    "updatedAt": 1794714199598
+    "updatedAt": 1794760095233
   },
   "1794690046775": {
     "id": "1794690046775",
