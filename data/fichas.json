@@ -664,5 +664,208 @@
     "anotacoes": "",
     "owner": "bewlla",
     "updatedAt": 1794689097065
+  },
+  "1794690046775": {
+    "id": "1794690046775",
+    "nome": "",
+    "idade": "",
+    "alturaPeso": "",
+    "campanha": "",
+    "jogador": "",
+    "aparencia": "",
+    "foto": "",
+    "especiais": {
+      "AGI": 1,
+      "FOR": 1,
+      "INT": 1,
+      "PRE": 1,
+      "VIG": 1,
+      "VON": 1
+    },
+    "pericias": {
+      "Acalmar": 1,
+      "Analisar": 1,
+      "Atualidades": 1,
+      "Atletismo": 1,
+      "Burocracia": 1,
+      "C. Exatas": 1,
+      "C. Humanas": 1,
+      "C. Naturais": 1,
+      "Defender": 1,
+      "Destreza": 1,
+      "Diplomacia": 1,
+      "Furtividade": 1,
+      "Intimidação": 1,
+      "Lutar": 1,
+      "Malandragem": 1,
+      "Medicina": 1,
+      "Memória": 1,
+      "Ocultismo": 1,
+      "Percepção": 1,
+      "Pesquisar": 1,
+      "Pilotagem": 1,
+      "Pontaria": 1,
+      "Preparação": 1,
+      "Religião": 1,
+      "Sobrevivência": 1,
+      "Tática": 1,
+      "Tecnologia": 1,
+      "Uso de Arma Branca": 1,
+      "Uso de Arma de Fogo": 1,
+      "Vasculhar": 1
+    },
+    "monomanias": [],
+    "pv": {
+      "atual": 15,
+      "extra": 0,
+      "nota": "",
+      "lesaoGrave": false,
+      "morto": false,
+      "vidaAntesMorte": null
+    },
+    "ps": {
+      "atual": 100,
+      "nota": ""
+    },
+    "pulsoes": {
+      "atual": 0,
+      "nota": ""
+    },
+    "pp": {
+      "atual": 0,
+      "max": 0,
+      "nota": ""
+    },
+    "contadores": [],
+    "pontoPartida": 3,
+    "raio": 5,
+    "inventario": [],
+    "status": {},
+    "condicoes": [],
+    "combate": "",
+    "anotacoes": "",
+    "owner": "marinaf",
+    "updatedAt": 1794690065296
+  },
+  "1794690051456": {
+    "id": "1794690051456",
+    "nome": "Leontiev Korst & Koschei",
+    "idade": "12",
+    "alturaPeso": "1,50. 40kg",
+    "campanha": "",
+    "jogador": "",
+    "aparencia": "",
+    "foto": "",
+    "especiais": {
+      "AGI": 1,
+      "FOR": 1,
+      "INT": 1,
+      "PRE": 1,
+      "VIG": 1,
+      "VON": 1
+    },
+    "pericias": {
+      "Acalmar": 1,
+      "Analisar": 1,
+      "Atualidades": 1,
+      "Atletismo": 1,
+      "Burocracia": 1,
+      "C. Exatas": 1,
+      "C. Humanas": 1,
+      "C. Naturais": 1,
+      "Defender": 1,
+      "Destreza": 1,
+      "Diplomacia": 1,
+      "Furtividade": 1,
+      "Intimidação": 1,
+      "Lutar": 1,
+      "Malandragem": 1,
+      "Medicina": 1,
+      "Memória": 1,
+      "Ocultismo": 1,
+      "Percepção": 1,
+      "Pesquisar": 1,
+      "Pilotagem": 1,
+      "Pontaria": 1,
+      "Preparação": 1,
+      "Religião": 1,
+      "Sobrevivência": 1,
+      "Tática": 1,
+      "Tecnologia": 1,
+      "Uso de Arma Branca": 1,
+      "Uso de Arma de Fogo": 1,
+      "Vasculhar": 1
+    },
+    "monomanias": [
+      {
+        "traco": "PER",
+        "nome": "Déjà Vu?",
+        "desc": "→ Uma vez por cena, pode re-rolar um dado.\n→ Sempre que você ativa uma monomania de Perspicácia, ganha +1 uso de Déjà Vu?"
+      },
+      {
+        "traco": "PER",
+        "nome": "Sequência Veloz",
+        "desc": "→ O status de Ligeiro passa a durar até você fracassar.\n→ Você ganha 1 Pulsão sempre que fica Ligeiro."
+      },
+      {
+        "traco": "PER",
+        "nome": "Performance Otimizada",
+        "desc": "→ Uma vez por cena, pode sacrificar 1 Pulsão para rolá-la e transformar o resultado em X Pontos de Pacto, sendo X o valor obtido."
+      },
+      {
+        "traco": "DET",
+        "nome": "Espírito Inabalável",
+        "desc": "→ Sempre que empata, pode re-rolar o valor obtido durante o desempate."
+      },
+      {
+        "traco": "DET",
+        "nome": "Golpe Cirúrgico",
+        "desc": "→ Quando der um ataque bem-sucedido, pode fazer um Pacto Mental para então ganhar +1 dado de dano."
+      },
+      {
+        "traco": "RAC",
+        "nome": "Paciência",
+        "desc": "→ Você pode passar seu turno para no próximo ter +1 Ação e um status a sua escolha."
+      }
+    ],
+    "pv": {
+      "atual": 15,
+      "extra": 0,
+      "nota": "",
+      "lesaoGrave": false,
+      "morto": false,
+      "vidaAntesMorte": null
+    },
+    "ps": {
+      "atual": 100,
+      "nota": ""
+    },
+    "pulsoes": {
+      "atual": 0,
+      "nota": ""
+    },
+    "pp": {
+      "atual": 0,
+      "max": 0,
+      "nota": ""
+    },
+    "contadores": [],
+    "pontoPartida": 0,
+    "raio": 5,
+    "inventario": [
+      {
+        "nome": "Metralhadora/Fuzil (Ex: AK-47)",
+        "cat": "4",
+        "carga": "4",
+        "bonus": 0,
+        "desc": "→ 2d8 de dano (+1d8 a queima-roupa)\n→ Tiros por turno: 2 (sem desvantagem) - 3 (1 desvantagem) - 4 (2 desvantagens)\n→ Distância: Média/Longa\n→ Capacidade: Variável\n→ Categoria: 4\n→ Carga: 4"
+      }
+    ],
+    "status": {},
+    "condicoes": [],
+    "combate": "",
+    "anotacoes": "",
+    "owner": "diegotorres",
+    "updatedAt": 1794690951884
   }
 }

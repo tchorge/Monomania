@@ -16,5 +16,17 @@
     "papel": "jogador",
     "salt": "d492ba80050c1ac5db580359962b91e8",
     "hash": "634069428480c4546ab3fa1e99d9e88e9b63cf62dd6668ad319bebffd86fac9a"
+  },
+  "marinaf": {
+    "nome": "marina",
+    "papel": "jogador",
+    "salt": "daf485c238bf7668dc7961d07fc9ba76",
+    "hash": "18f15661f79cfdbe1c55efeda1594d9a1563c5ad836e1864c42afe8376f27122"
+  },
+  "diegotorres": {
+    "nome": "Diego",
+    "papel": "jogador",
+    "salt": "7e136d81e4efb368cc2cde942191842d",
+    "hash": "0c0a3378452b0f0cdfc9c93f9359478b5fe5f40958198e3f75c1204b3df34b9a"
   }
 }
