@@ -440,7 +440,7 @@
     "aparencia": "",
     "foto": "",
     "especiais": {
-      "AGI": 13,
+      "AGI": 14,
       "FOR": 10,
       "INT": 11,
       "PRE": 12,
@@ -450,7 +450,7 @@
     "pericias": {
       "Acalmar": 8,
       "Analisar": 10,
-      "Atualidades": 6,
+      "Atualidades": 5,
       "Atletismo": 8,
       "Burocracia": 4,
       "C. Exatas": 6,
@@ -458,23 +458,23 @@
       "C. Naturais": 10,
       "Defender": 9,
       "Destreza": 9,
-      "Diplomacia": 8,
+      "Diplomacia": 7,
       "Furtividade": 11,
       "Intimidação": 7,
       "Lutar": 11,
       "Malandragem": 9,
       "Medicina": 13,
-      "Memória": 7,
-      "Ocultismo": 5,
+      "Memória": 6,
+      "Ocultismo": 8,
       "Percepção": 12,
       "Pesquisar": 5,
-      "Pilotagem": 6,
-      "Pontaria": 14,
+      "Pilotagem": 7,
+      "Pontaria": 13,
       "Preparação": 10,
       "Religião": 4,
       "Sobrevivência": 11,
       "Tática": 8,
-      "Tecnologia": 7,
+      "Tecnologia": 6,
       "Uso de Arma Branca": 11,
       "Uso de Arma de Fogo": 12,
       "Vasculhar": 9
@@ -663,7 +663,7 @@
     "combate": "",
     "anotacoes": "",
     "owner": "bewlla",
-    "updatedAt": 1794689097065
+    "updatedAt": 1794714199598
   },
   "1794690046775": {
     "id": "1794690046775",
@@ -749,52 +749,52 @@
   },
   "1794690051456": {
     "id": "1794690051456",
-    "nome": "Leontiev Korst & Koschei",
+    "nome": "Leontiev Korst",
     "idade": "12",
     "alturaPeso": "1,50. 40kg",
-    "campanha": "",
-    "jogador": "",
+    "campanha": "Grunts",
+    "jogador": "Diego",
     "aparencia": "",
     "foto": "",
     "especiais": {
-      "AGI": 1,
-      "FOR": 1,
-      "INT": 1,
-      "PRE": 1,
-      "VIG": 1,
-      "VON": 1
+      "AGI": 12,
+      "FOR": 9,
+      "INT": 9,
+      "PRE": 13,
+      "VIG": 10,
+      "VON": 14
     },
     "pericias": {
-      "Acalmar": 1,
-      "Analisar": 1,
-      "Atualidades": 1,
-      "Atletismo": 1,
-      "Burocracia": 1,
-      "C. Exatas": 1,
-      "C. Humanas": 1,
-      "C. Naturais": 1,
-      "Defender": 1,
-      "Destreza": 1,
-      "Diplomacia": 1,
-      "Furtividade": 1,
-      "Intimidação": 1,
-      "Lutar": 1,
-      "Malandragem": 1,
-      "Medicina": 1,
-      "Memória": 1,
-      "Ocultismo": 1,
-      "Percepção": 1,
-      "Pesquisar": 1,
-      "Pilotagem": 1,
-      "Pontaria": 1,
-      "Preparação": 1,
-      "Religião": 1,
-      "Sobrevivência": 1,
-      "Tática": 1,
-      "Tecnologia": 1,
-      "Uso de Arma Branca": 1,
-      "Uso de Arma de Fogo": 1,
-      "Vasculhar": 1
+      "Acalmar": 8,
+      "Analisar": 7,
+      "Atualidades": 6,
+      "Atletismo": 8,
+      "Burocracia": 5,
+      "C. Exatas": 5,
+      "C. Humanas": 4,
+      "C. Naturais": 4,
+      "Defender": 11,
+      "Destreza": 10,
+      "Diplomacia": 10,
+      "Furtividade": 11,
+      "Intimidação": 10,
+      "Lutar": 9,
+      "Malandragem": 9,
+      "Medicina": 8,
+      "Memória": 7,
+      "Ocultismo": 6,
+      "Percepção": 11,
+      "Pesquisar": 5,
+      "Pilotagem": 3,
+      "Pontaria": 8,
+      "Preparação": 7,
+      "Religião": 3,
+      "Sobrevivência": 9,
+      "Tática": 7,
+      "Tecnologia": 6,
+      "Uso de Arma Branca": 11,
+      "Uso de Arma de Fogo": 12,
+      "Vasculhar": 10
     },
     "monomanias": [
       {
@@ -829,7 +829,7 @@
       }
     ],
     "pv": {
-      "atual": 15,
+      "atual": 18,
       "extra": 0,
       "nota": "",
       "lesaoGrave": false,
@@ -850,15 +850,41 @@
       "nota": ""
     },
     "contadores": [],
-    "pontoPartida": 0,
+    "pontoPartida": 2,
     "raio": 5,
     "inventario": [
       {
         "nome": "Metralhadora/Fuzil (Ex: AK-47)",
-        "cat": "4",
+        "cat": "8",
         "carga": "4",
         "bonus": 0,
-        "desc": "→ 2d8 de dano (+1d8 a queima-roupa)\n→ Tiros por turno: 2 (sem desvantagem) - 3 (1 desvantagem) - 4 (2 desvantagens)\n→ Distância: Média/Longa\n→ Capacidade: Variável\n→ Categoria: 4\n→ Carga: 4"
+        "desc": "→ 2d8 de dano (+1d8 a queima-roupa)\n→ Tiros por turno: 2 (sem desvantagem) - 3 (1 desvantagem) - 4 (2 desvantagens)\n→ Distância: Média/Longa\n→ Capacidade: Variável\n→ Categoria: 4\n→ Carga: 4",
+        "melhorias": [
+          "Calibre Maior",
+          "Grip Frontal"
+        ],
+        "anotacao": "2d10"
+      },
+      {
+        "nome": "Espada",
+        "cat": "2",
+        "carga": "3",
+        "bonus": 0,
+        "desc": "→ 1d10+(Força) de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 2\n→ Carga: 3"
+      },
+      {
+        "nome": "Bolsa",
+        "cat": "1",
+        "carga": "0",
+        "bonus": 4,
+        "desc": "→ Capacidade: 4 cargas\n→ Categoria: 1"
+      },
+      {
+        "nome": "Caixa de Munição/Pente",
+        "cat": "1",
+        "carga": "1",
+        "bonus": 0,
+        "desc": "→ Capacidade: Variável\n→ Categoria: 1\n→ Carga: 1"
       }
     ],
     "status": {},
@@ -866,6 +892,6 @@
     "combate": "",
     "anotacoes": "",
     "owner": "diegotorres",
-    "updatedAt": 1794690951884
+    "updatedAt": 1794719035422
   }
 }
