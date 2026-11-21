@@ -98,8 +98,13 @@ const med = (a, b) => Math.round((a + b) / 2);
 
 export const deslocamento = (agi) => faixa(agi, [[4, 4], [8, 6], [12, 8], [15, 10], [99, 12]]);
 export const dadoForca = (f) => faixa(f, [[4, '1'], [8, '1d2'], [12, '1d3'], [15, '1d4'], [99, '1d6']]);
-export const pvMaximo = (vig) =>
-  faixa(vig, [[3, 15], [6, 16], [9, 17], [12, 18], [14, 19], [15, 20], [16, 21], [17, 22], [99, 23]]);
+export const pvMaximo = (vig, fragilidade = 0) =>
+  Math.max(1, faixa(vig, [[3, 15], [6, 16], [9, 17], [12, 18], [14, 19], [15, 20], [16, 21], [17, 22], [99, 23]]) - (Number(fragilidade) || 0));
+export const GRAUS_FRAGILIDADE = [
+  { valor: 0, nome: 'Nenhum', penalidade: 0 },
+  { valor: 3, nome: 'Moderado', penalidade: 3 },
+  { valor: 6, nome: 'Grave', penalidade: 6 },
+];
 export const nivelPresenca = (pre, intel, von) => {
   const v = med(pre, Math.max(intel, von));
   return faixa(v, [[1, 1], [3, 2], [5, 3], [12, 4], [13, 5], [14, 6], [15, 7], [16, 8], [17, 9], [99, 10]]);
@@ -123,7 +128,7 @@ export const novaFicha = () => ({
   especiais: { AGI: 1, FOR: 1, INT: 1, PRE: 1, VIG: 1, VON: 1 },
   pericias: Object.fromEntries(PERICIAS.map((p) => [p, 1])),
   monomanias: [],
-  pv: { atual: 15, extra: 0, nota: '', lesaoGrave: false, morto: false, vidaAntesMorte: null },
+  pv: { atual: 15, extra: 0, fragilidade: 0, nota: '', lesaoGrave: false, morto: false, vidaAntesMorte: null },
   ps: { atual: 100, nota: '' },
   pulsoes: { atual: 0, nota: '' },
   pp: { atual: 0, max: 0, nota: '' },

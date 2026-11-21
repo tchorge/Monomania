@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ESPECIAIS, PERICIAS, TRACOS, CAPACIDADE, PONTOS_PARTIDA, TABELA_PARTIDA,
+  ESPECIAIS, PERICIAS, TRACOS, CAPACIDADE, PONTOS_PARTIDA, TABELA_PARTIDA, GRAUS_FRAGILIDADE,
   NIVEIS_PRESENCA, STATUS, CONDICOES, RAIO, DESCANSO,
   deslocamento, dadoForca, pvMaximo, nivelPresenca, capacidadeCarga, medoAtual,
 } from '../data/rules.js';
@@ -18,12 +18,45 @@ const pct = (a, m) => (m > 0 ? Math.min(100, Math.max(0, (a / m) * 100)) : 0);
 const COR_TRACO = { PER: '#f5d76e', AUD: '#ef2b3c', DET: '#ff8c1a', VIR: '#3ddc84', DES: '#a66cff', RAC: '#4c9aff' };
 
 const catalogo = (nome) => EQUIPAMENTOS.find((x) => x.nome === nome);
-// melhorias entram na carga do item; itens com quantidade (categoria 0) multiplicam a carga
-const cargaItem = (it) => num(it.carga) * (it.qtd ?? 1) + (it.melhorias || []).reduce((s, n) => s + num(catalogo(n)?.carga), 0);
+const ajusteDescricao = (texto = '', tipo) => {
+  const atributo = tipo === 'categoria' ? 'categoria(?:\\s+do\\s+item)?' : 'carga';
+  const valor = '[+-]\\s*\\d+(?:[.,]\\d+)?';
+  const padroes = [
+    new RegExp(`(${valor})\\s*(?:de\\s*)?${atributo}\\b`, 'gi'),
+    new RegExp(`\\b${atributo}\\b\\s*(?:(?:em|de)\\s*)?(${valor})`, 'gi'),
+  ];
+  return padroes.reduce((total, padrao) => {
+    let achado;
+    while ((achado = padrao.exec(texto))) {
+      total += Number(achado[1].replace(/\s/g, '').replace(',', '.')) || 0;
+    }
+    return total;
+  }, 0);
+};
+const qtdItem = (it) => num(it.qtd ?? 1, 1, 99);
+const catalogoItem = (it) => catalogo(it.modelo || it.nome)
+  || (it.desc && EQUIPAMENTOS.find((item) => item.desc === it.desc));
+const nomeItem = (it) => it.nome || it.modelo || catalogoItem(it)?.nome || '';
+const nomeModelo = (it) => it.modelo || (it.desc && EQUIPAMENTOS.find((item) => item.desc === it.desc)?.nome);
+const ajustesItem = (it, tipo) => ajusteDescricao(it.anotacao, tipo)
+  + (it.melhorias || []).reduce((total, nome) => total + ajusteDescricao(catalogo(nome)?.desc, tipo), 0);
+const cargaItem = (it) => {
+  const qtd = qtdItem(it);
+  const melhorias = (it.melhorias || []).reduce((total, nome) => total + num(catalogo(nome)?.carga), 0);
+  return Math.max(0, (num(it.carga) + ajustesItem(it, 'carga') + melhorias) * qtd);
+};
+const categoriaItem = (it) => {
+  const qtd = qtdItem(it);
+  const melhorias = (it.melhorias || []).reduce((total, nome) => total + num(catalogo(nome)?.cat), 0);
+  return Math.max(0, (num(it.cat) + ajustesItem(it, 'categoria') + melhorias) * qtd);
+};
+const ITENS_SEM_ROLAGEM = new Set(EQUIPAMENTOS
+  .filter((it) => ['Armas de Fogo', 'Armas Brancas'].includes(it.categoria) && Number(it.cat) === 0)
+  .map((it) => it.nome));
 const GRUPO_MELHORIAS = { 'Armas de Fogo': 'Modificações de Armas de Fogo', 'Armas Brancas': 'Melhorias de Armas Brancas' };
 const GRUPOS_OCULTOS = Object.values(GRUPO_MELHORIAS);
 const grupoMelhorias = (it) => {
-  const c = catalogo(it.nome);
+  const c = catalogoItem(it);
   return c && c.nome !== 'Caixa de Munição/Pente' ? GRUPO_MELHORIAS[c.categoria] || null : null;
 };
 
@@ -35,6 +68,17 @@ const ABAS = [
   { id: 'notas', nome: 'Notas' },
   { id: 'regras', nome: 'Regras' },
 ];
+
+function NomeItem({ item, onChange }) {
+  const nome = nomeItem(item);
+  const modelo = nomeModelo(item);
+  return (
+    <div className="it-nome-grupo">
+      <input className="it-nome" placeholder="Nome do item" value={nome} onChange={(ev) => onChange(ev.target.value)} />
+      {modelo && nome !== modelo && <span className="it-modelo">({modelo})</span>}
+    </div>
+  );
+}
 
 // botão que repete enquanto estiver pressionado (acelera aos poucos)
 function Rb({ onClick, className = 'rb', children, ...rest }) {
@@ -76,7 +120,8 @@ function Stepper({ valor, onChange, min = 0, max = 999, passo = 1 }) {
   return (
     <div className="stepper">
       <Rb className="" aria-label="Diminuir" onClick={() => onChange(num(valor - passo, min, max))}>−</Rb>
-      <input type="number" inputMode="numeric" value={valor} onChange={(e) => onChange(num(e.target.value, min, max))} />
+      <input type="number" inputMode="numeric" value={valor}
+        onChange={(e) => onChange(num(e.target.value, min, max))} />
       <Rb className="" aria-label="Aumentar" onClick={() => onChange(num(valor + passo, min, max))}>+</Rb>
     </div>
   );
@@ -204,10 +249,22 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
   const [exprErro, setExprErro] = useState(false);
   const [busca, setBusca] = useState('');
   const [ordem, setOrdem] = useState('az');
+  const [itemArrastado, setItemArrastado] = useState(null);
   const primeira = useRef(true);
   const vindoDeFora = useRef(false);
   const visto = useRef(inicial.updatedAt || 0);
   const audio = useRef(null);
+
+  useEffect(() => {
+    const desfocarCampoNumerico = (evento) => {
+      const campo = evento.target;
+      if (campo instanceof HTMLInputElement && campo.type === 'number' && document.activeElement === campo) {
+        campo.blur();
+      }
+    };
+    document.addEventListener('wheel', desfocarCampoNumerico, { capture: true, passive: true });
+    return () => document.removeEventListener('wheel', desfocarCampoNumerico, true);
+  }, []);
 
   // alterações feitas por outra pessoa (jogador/mestre) chegam ao vivo
   useEffect(() => {
@@ -243,12 +300,11 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
   const setIn = (k, sub, v) => setF((o) => ({ ...o, [k]: { ...o[k], [sub]: v } }));
 
   const e = f.especiais;
-  const pvMax = pvMaximo(e.VIG) + num(f.pv.extra);
+  const pvMax = pvMaximo(e.VIG, f.pv.fragilidade) + num(f.pv.extra);
   const nivel = nivelPresenca(e.PRE, e.INT, e.VON);
   const cargaUsada = f.inventario.reduce((s, i) => s + cargaItem(i), 0);
-  const categoriaTotal = f.inventario.reduce((s, i) =>
-    s + num(i.cat) * (i.qtd ?? 1) + (i.melhorias || []).reduce((total, nome) => total + num(catalogo(nome)?.cat), 0), 0);
-  const bonusCarga = f.inventario.reduce((s, i) => s + num(i.bonus), 0);
+  const categoriaTotal = f.inventario.reduce((s, i) => s + categoriaItem(i), 0);
+  const bonusCarga = f.inventario.reduce((s, i) => s + num(i.bonus) * qtdItem(i), 0);
   const { corpo: capCorpo, total: capTotal, limite: capLimite } = capacidadeCarga(e.FOR, bonusCarga);
   const medo = medoAtual(f.ps.atual);
 
@@ -271,6 +327,11 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
     return PERICIAS.filter((p) => p.toLowerCase().includes(b)).sort((a, c) =>
       ordem === 'valor' ? f.pericias[c] - f.pericias[a] || a.localeCompare(c, 'pt-BR') : a.localeCompare(c, 'pt-BR'));
   }, [busca, ordem, f.pericias]);
+  const monomaniasOrdenadas = useMemo(() => {
+    const ordemTracos = Object.fromEntries(TRACOS.map((traco, i) => [traco.key, i]));
+    return f.monomanias.map((m, i) => ({ m, i }))
+      .sort((a, b) => (ordemTracos[a.m.traco] ?? TRACOS.length) - (ordemTracos[b.m.traco] ?? TRACOS.length) || a.i - b.i);
+  }, [f.monomanias]);
 
   const mostrar = (r) => {
     setRes(r);
@@ -348,10 +409,10 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
     const n = rolar(3);
     mostrar({ tipo: 'info', nome: 'Lacuna de Memória (d3)', dados: [`d3 · ${n}`], total: n, nota: LACUNAS[n - 1], detalhe: LACUNAS[n - 1].slice(0, 60) });
   };
-  // Item de categoria 0: a quantidade (1d4) é rolada sozinha ao adicionar
+  // Armas de categoria 0 são adicionadas individualmente; outros itens funcionais mantêm a rolagem do livro.
   const adicionarItem = (it) => {
-    let novo = it;
-    if (String(it.cat) === '0') {
+    let novo = { ...it, nome: nomeItem(it) };
+    if (String(it.cat) === '0' && !ITENS_SEM_ROLAGEM.has(it.modelo || it.nome)) {
       const n = rolar(4);
       novo = { ...it, qtd: n };
       mostrar({ tipo: 'info', nome: `Quantidade: ${it.nome}`, dados: [`d4 · ${n}`], total: n, nota: `Você possui ${n} unidade(s).`, detalhe: `${n} unidade(s)` });
@@ -442,6 +503,15 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
   const delMono = (i) => setF((o) => ({ ...o, monomanias: o.monomanias.filter((_, j) => j !== i) }));
   const updItem = (i, patch) =>
     setF((o) => ({ ...o, inventario: o.inventario.map((it, j) => (j === i ? { ...it, ...patch } : it)) }));
+  const moverItem = (origem, destino) => {
+    if (origem === destino || origem < 0 || destino < 0 || origem >= f.inventario.length || destino >= f.inventario.length) return;
+    setF((o) => {
+      const inventario = [...o.inventario];
+      const [item] = inventario.splice(origem, 1);
+      inventario.splice(destino, 0, item);
+      return { ...o, inventario };
+    });
+  };
   const toggleCond = (c) =>
     set('condicoes', f.condicoes.includes(c) ? f.condicoes.filter((x) => x !== c) : [...f.condicoes, c]);
 
@@ -579,6 +649,14 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
             <details className="fx-mais">
               <summary>Mais detalhes</summary>
               <div className="campos">
+                <label>Grau de Fragilidade
+                  <select value={f.pv.fragilidade ?? 0}
+                    onChange={(ev) => setIn('pv', 'fragilidade', Number(ev.target.value))}>
+                    {GRAUS_FRAGILIDADE.map((grau) => (
+                      <option key={grau.valor} value={grau.valor}>{grau.nome} (−{grau.penalidade} PV)</option>
+                    ))}
+                  </select>
+                </label>
                 <label>PV extra<Stepper valor={f.pv.extra} max={50} onChange={(v) => setIn('pv', 'extra', v)} /></label>
                 <label>PP máximo<Stepper valor={f.pp.max} onChange={(v) => setIn('pp', 'max', v)} /></label>
                 <label>Nota de PV<input value={f.pv.nota} onChange={(ev) => setIn('pv', 'nota', ev.target.value)} /></label>
@@ -676,7 +754,7 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
               {f.monomanias.length > nivel && <p className="alerta">Monomanias acima do nível de Presença Mental.</p>}
               <MonoAdd onAdd={addMono} />
             </Card>
-            {f.monomanias.map((m, i) => (
+            {monomaniasOrdenadas.map(({ m, i }) => (
               <article className="mono" key={i} style={{ '--cor': COR_TRACO[m.traco] }}>
                 <div className="mono-h">
                   <b>{m.nome}</b>
@@ -698,30 +776,69 @@ export default function Sheet({ inicial, remota, mestre, conectado, onVoltar }) 
               {cargaUsada > capTotal && <p className="alerta">{cargaUsada > capLimite ? 'Acima do limite absoluto (o dobro da capacidade)!' : 'Sobrecarregado: penalidades.'}</p>}
               {cargaUsada > capCorpo && bonusCarga === 0 && <p className="alerta">Acima do que cabe no corpo e bolsos ({capCorpo}). Adicione mochila, pochete ou similar.</p>}
               <EquipAdd onAdd={adicionarItem} />
-              <button className="sec" onClick={() => set('inventario', [...f.inventario, { nome: '', cat: '', carga: '', anotacao: '' }])}>+ Item em branco</button>
+              <button className="sec" onClick={() => set('inventario', [...f.inventario, {
+                id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+                nome: '', cat: '', carga: '', qtd: 1, anotacao: '',
+              }])}>+ Item em branco</button>
             </Card>
-            {f.inventario.map((it, i) => (
-              <article className="item-card" key={i}>
+            <div className="itens-grid">
+              {f.inventario.map((it, i) => (
+              <article className={`item-card ${itemArrastado === i ? 'arrastando' : ''}`} key={it.id || i}
+                onDragOver={(ev) => {
+                  if (ev.dataTransfer.types.includes('text/plain')) {
+                    ev.preventDefault();
+                    ev.dataTransfer.dropEffect = 'move';
+                  }
+                }}
+                onDrop={(ev) => {
+                  const origem = ev.dataTransfer.getData('text/plain');
+                  if (origem === '') return;
+                  ev.preventDefault();
+                  moverItem(Number(origem), i);
+                  setItemArrastado(null);
+                }}>
                 <div className="item">
-                  <input className="it-nome" placeholder="Nome do item" value={it.nome} onChange={(ev) => updItem(i, { nome: ev.target.value })} />
+                  <NomeItem item={it} onChange={(nome) => updItem(i, { nome })} />
+                  <div className="item-mover">
+                    <button type="button" className="mover-item" draggable
+                      onDragStart={(ev) => {
+                        ev.dataTransfer.effectAllowed = 'move';
+                        ev.dataTransfer.setData('text/plain', String(i));
+                        setItemArrastado(i);
+                      }}
+                      onDragEnd={() => setItemArrastado(null)} aria-label={`Arrastar ${nomeItem(it) || 'item'}`} title="Arraste para reordenar">⠿</button>
+                    <button type="button" className="mover-item" disabled={i === 0} onClick={() => moverItem(i, i - 1)}
+                      aria-label={`Mover ${nomeItem(it) || 'item'} para cima`} title="Mover para cima">↑</button>
+                    <button type="button" className="mover-item" disabled={i === f.inventario.length - 1} onClick={() => moverItem(i, i + 1)}
+                      aria-label={`Mover ${nomeItem(it) || 'item'} para baixo`} title="Mover para baixo">↓</button>
+                  </div>
                   <button className="x" onClick={() => set('inventario', f.inventario.filter((_, j) => j !== i))} aria-label="Remover">✕</button>
                 </div>
-                <div className={`campos mini ${it.qtd != null ? 'tres' : ''}`}>
-                  <label>Categoria<input type="number" inputMode="numeric" value={it.cat} onChange={(ev) => updItem(i, { cat: ev.target.value })} /></label>
-                  <label>Carga<input type="number" inputMode="numeric" value={it.carga} onChange={(ev) => updItem(i, { carga: ev.target.value })} /></label>
-                  {it.qtd != null && (
-                    <label>Quantidade<input type="number" inputMode="numeric" min="1" value={it.qtd} onChange={(ev) => updItem(i, { qtd: num(ev.target.value, 1, 99) })} /></label>
-                  )}
+                <div className="campos mini tres">
+                  <label>Categoria<input type="number" inputMode="numeric" value={it.cat}
+                    onChange={(ev) => updItem(i, { cat: ev.target.value })} /></label>
+                  <label>Carga<input type="number" inputMode="numeric" value={it.carga}
+                    onChange={(ev) => updItem(i, { carga: ev.target.value })} /></label>
+                  <label>Quantidade<input type="number" inputMode="numeric" min="1" value={it.qtd ?? 1}
+                    onChange={(ev) => updItem(i, { qtd: num(ev.target.value, 1, 99) })} /></label>
                 </div>
                 {it.desc && <pre className="desc">{it.desc}</pre>}
-                <textarea rows="2" placeholder="Anotação do item (opcional)" aria-label={`Anotação de ${it.nome || 'item'}`}
+                <textarea rows="2" placeholder="Anotação (ajustes: +1 carga, +1 categoria)" aria-label={`Anotação de ${it.nome || 'item'}`}
                   value={it.anotacao || ''} onChange={(ev) => updItem(i, { anotacao: ev.target.value })} />
+                {(ajustesItem(it, 'carga') || ajustesItem(it, 'categoria')) ? (
+                  <small className="ajustes-item">
+                    Ajustes detectados: {ajustesItem(it, 'carga') ? `${ajustesItem(it, 'carga') > 0 ? '+' : ''}${ajustesItem(it, 'carga')} carga` : ''}
+                    {ajustesItem(it, 'carga') && ajustesItem(it, 'categoria') ? ' · ' : ''}
+                    {ajustesItem(it, 'categoria') ? `${ajustesItem(it, 'categoria') > 0 ? '+' : ''}${ajustesItem(it, 'categoria')} categoria` : ''}
+                  </small>
+                ) : null}
                 {grupoMelhorias(it) && (
                   <Melhorias grupo={grupoMelhorias(it)} atuais={it.melhorias || []}
                     onAdd={(n) => addMelhoria(i, n)} onDel={(n) => delMelhoria(i, n)} />
                 )}
               </article>
-            ))}
+              ))}
+            </div>
             {!f.inventario.length && <p className="vazio">Inventário vazio.</p>}
           </>
         )}
@@ -1017,7 +1134,10 @@ function EquipAdd({ onAdd }) {
     const eq = catalogo(nome);
     if (!eq) return;
     const cap = eq.categoria === 'Armazenamento' ? Number(/(\d+) cargas/.exec(eq.desc)?.[1] || 0) : 0;
-    onAdd({ nome: eq.nome, cat: eq.cat, carga: eq.carga || '0', bonus: cap, desc: eq.desc });
+    onAdd({
+      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+      nome: eq.nome, modelo: eq.nome, cat: eq.cat, carga: eq.carga || '0', qtd: 1, bonus: cap, desc: eq.desc,
+    });
     setNome('');
   };
   const lista = EQUIPAMENTOS.filter((x) => !GRUPOS_OCULTOS.includes(x.categoria));

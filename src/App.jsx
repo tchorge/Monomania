@@ -121,7 +121,7 @@ function Login({ onLogin }) {
 }
 
 const Mini = ({ f }) => {
-  const max = pvMaximo(f.especiais?.VIG || 1) + (Number(f.pv?.extra) || 0);
+  const max = pvMaximo(f.especiais?.VIG || 1, f.pv?.fragilidade) + (Number(f.pv?.extra) || 0);
   const pv = f.pv?.atual ?? 0;
   const ps = f.ps?.atual ?? 0;
   return (

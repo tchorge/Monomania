@@ -86,7 +86,8 @@
       "nota": "",
       "lesaoGrave": false,
       "morto": false,
-      "vidaAntesMorte": null
+      "vidaAntesMorte": null,
+      "fragilidade": 0
     },
     "ps": {
       "atual": 100,
@@ -105,7 +106,7 @@
     "raio": 5,
     "inventario": [
       {
-        "nome": "Machado",
+        "nome": "",
         "cat": "2",
         "carga": "3",
         "bonus": 0,
@@ -113,7 +114,8 @@
         "melhorias": [
           "Peso Distribuído",
           "Feita pra Mim"
-        ]
+        ],
+        "qtd": 1
       },
       {
         "nome": "Pistola",
@@ -130,7 +132,8 @@
         "cat": "1",
         "carga": "1",
         "bonus": 0,
-        "desc": "→ Capacidade: Variável\n→ Categoria: 1\n→ Carga: 1"
+        "desc": "→ Capacidade: Variável\n→ Categoria: 1\n→ Carga: 1",
+        "anotacao": ""
       },
       {
         "nome": "Proteção Leve (Ex: Colete Oculto)",
@@ -144,7 +147,8 @@
         "cat": "2",
         "carga": "0",
         "bonus": 5,
-        "desc": "→ Capacidade: 5 cargas\n→ Categoria: 2"
+        "desc": "→ Capacidade: 5 cargas\n→ Categoria: 2",
+        "qtd": 1
       },
       {
         "nome": "Ataduras",
@@ -173,7 +177,7 @@
     "combate": "",
     "anotacoes": "🩸 MUTAÇÃO: BERSERK!\n\nSede de Sangue (Sustentável — Custo: 1 PN/turno):\nCada ataque bem-sucedido que você acertar (tiro ou corte) ou receber, ganha 1 Ponto de Sangue (dura até o fim da cena e substitui Pontos de Numen sem subir sua Taxa Numênica).\n\nLei do Mais Forte (Manifestável — Custo: 3 PN / 3 Pontos de Sangue):\nAo causar dano, drene o sangue do alvo para:\nRegenerar 1d6 PV; OU\nGanhar 1d6 Pontos de Sangue; OU\n+1 dado de dano no próximo ataque.\n\nFúria Implacável (Sustentável — Custo: 4 PN / 4 Pontos de Sangue por turno):\nNo início de cada um dos seus turnos: ganha +1 Ação Ofensiva e reativa todas as monomanias de ataque (Encaçapado! reseta todo turno). Fica com o status Cabisbaixo (-1 em testes de Vontade).",
     "owner": "george",
-    "updatedAt": 1794442801838,
+    "updatedAt": 1795234510376,
     "contadores": [
       {
         "id": "7e95cc5c-83d5-4c98-b6a6-e2027264c4ac",
