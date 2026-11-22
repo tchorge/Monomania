@@ -177,7 +177,7 @@
     "combate": "",
     "anotacoes": "🩸 MUTAÇÃO: BERSERK!\n\nSede de Sangue (Sustentável — Custo: 1 PN/turno):\nCada ataque bem-sucedido que você acertar (tiro ou corte) ou receber, ganha 1 Ponto de Sangue (dura até o fim da cena e substitui Pontos de Numen sem subir sua Taxa Numênica).\n\nLei do Mais Forte (Manifestável — Custo: 3 PN / 3 Pontos de Sangue):\nAo causar dano, drene o sangue do alvo para:\nRegenerar 1d6 PV; OU\nGanhar 1d6 Pontos de Sangue; OU\n+1 dado de dano no próximo ataque.\n\nFúria Implacável (Sustentável — Custo: 4 PN / 4 Pontos de Sangue por turno):\nNo início de cada um dos seus turnos: ganha +1 Ação Ofensiva e reativa todas as monomanias de ataque (Encaçapado! reseta todo turno). Fica com o status Cabisbaixo (-1 em testes de Vontade).",
     "owner": "george",
-    "updatedAt": 1795234510376,
+    "updatedAt": 1795303356956,
     "contadores": [
       {
         "id": "7e95cc5c-83d5-4c98-b6a6-e2027264c4ac",
@@ -546,11 +546,29 @@
         "id": "1794543511246",
         "nome": "NUMEN",
         "atual": 30
+      },
+      {
+        "id": "1795303511048",
+        "nome": "TAXA NUMÊNICA",
+        "atual": 0
       }
     ],
     "pontoPartida": 3,
     "raio": 5,
     "inventario": [
+      {
+        "nome": "Besta Modificada",
+        "cat": "1",
+        "carga": "2",
+        "bonus": 0,
+        "desc": "→ 1d8 de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 1\n→ Carga: 2",
+        "anotacao": "Besta modificada para se adaptar as substâncias da mutação. As flechas também são modificadas e causam efeitos adicionais.\n\nMira Holográfica \n→ Efeito: Aprimora a ação de \"Mirar\" a curta/média distância, podendo realizá-la como uma ação\nlivre.\n→ +2 de Categoria",
+        "melhorias": [
+          "Peso Distribuído",
+          "Feita pra Mim"
+        ],
+        "qtd": 1
+      },
       {
         "nome": "Mochila Civil",
         "cat": "2",
@@ -559,24 +577,21 @@
         "desc": "→ Capacidade: 10 cargas\n→ Categoria: 2"
       },
       {
-        "nome": "Arco e Flecha/Besta",
-        "cat": "1",
-        "carga": "2",
-        "bonus": 0,
-        "desc": "→ 1d8 de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 1\n→ Carga: 2",
-        "anotacao": "Besta modificada para se adaptar as substâncias da mutação. As flechas também são modificadas e causam efeitos adicionais.\nTEM ALTERAÇÃO DE MIRA HOLOGRÁFICA\n\n",
-        "melhorias": [
-          "Peso Distribuído",
-          "Feita pra Mim"
-        ]
-      },
-      {
+        "id": "1795303890385-0.5030738763353008",
         "nome": "Canivete",
+        "modelo": "Canivete",
         "cat": "0",
         "carga": "0",
+        "qtd": 1,
         "bonus": 0,
-        "desc": "→ 1d4+(Força) de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 0\n→ Carga: 0",
-        "qtd": 1
+        "desc": "→ 1d4+(Força) de dano\n→ Ataques por turno: 1 (Sem desvantagem)\n→ Categoria: 0\n→ Carga: 0"
+      },
+      {
+        "nome": "Proteção Leve (Ex: Colete Oculto)",
+        "cat": "2",
+        "carga": "1",
+        "bonus": 0,
+        "desc": "→ Absorção: 2\n→ Categoria: 2\n→ Carga: 1"
       },
       {
         "nome": "Antidoto",
@@ -599,7 +614,16 @@
         "carga": "1",
         "bonus": 0,
         "desc": "→ Efeito: 1d6 de cura (Crítico: 6) (Ação Prolongada) / 1d3 de cura (Crítico: 3) (Ação Padrão)\n→ Efeito Temporário: 1 de cura (Ação Padrão)\n→ Aplicação: Teste de Medicina com vantagem\n→ Tipo de Ferimento: Todos com exceção de Queimadura\n→ Usos: 3\n→ Categoria: 1\n→ Carga: 1",
-        "anotacao": ""
+        "anotacao": "",
+        "qtd": 1
+      },
+      {
+        "nome": "Kit de Queimaduras",
+        "cat": "1",
+        "carga": "1",
+        "bonus": 0,
+        "desc": "→ Efeito: 1d6 de cura (Crítico: 6) (Ação Prolongada)\n→ Efeito Temporário: 1 de cura (Ação Padrão)\n→ Aplicação: Teste de Medicina com vantagem\n→ Tipo de Ferimento: Queimadura\n→ Usos: 3\n→ Categoria: 1\n→ Carga: 1",
+        "qtd": 1
       },
       {
         "nome": "Analgésico",
@@ -608,13 +632,6 @@
         "bonus": 0,
         "desc": "→ Efeito: Inibe dores parcialmente (Ação Rápida)\n→ Aplicação: Consumo\n→ Tipo de Ferimento: Geral\n→ Categoria: 0\n→ Carga: 0",
         "qtd": 4
-      },
-      {
-        "nome": "Kit de Queimaduras",
-        "cat": "1",
-        "carga": "1",
-        "bonus": 0,
-        "desc": "→ Efeito: 1d6 de cura (Crítico: 6) (Ação Prolongada)\n→ Efeito Temporário: 1 de cura (Ação Padrão)\n→ Aplicação: Teste de Medicina com vantagem\n→ Tipo de Ferimento: Queimadura\n→ Usos: 3\n→ Categoria: 1\n→ Carga: 1"
       },
       {
         "nome": "Remédio Muscular",
@@ -640,26 +657,14 @@
         "nome": "Frasco de Substância C",
         "cat": "0",
         "carga": "1",
-        "anotacao": ""
+        "anotacao": "",
+        "qtd": 1
       },
       {
         "nome": "Granada Corrosiva",
         "cat": "0",
         "carga": "1",
         "anotacao": "→ 1d12 de Dano em Área\n→ Efeito: Granada com propriedades corrosivas, que corrói alvos e objetos no contato.\n→ Distância: Curta"
-      },
-      {
-        "nome": "Mira Holográfica",
-        "cat": "2",
-        "carga": "0",
-        "anotacao": "NA BESTA:\n→ Efeito: Aprimora a ação de \"Mirar\" a curta/média distância, podendo realizá-la como uma ação\nlivre."
-      },
-      {
-        "nome": "Proteção Leve (Ex: Colete Oculto)",
-        "cat": "2",
-        "carga": "1",
-        "bonus": 0,
-        "desc": "→ Absorção: 2\n→ Categoria: 2\n→ Carga: 1"
       }
     ],
     "status": {},
@@ -667,7 +672,7 @@
     "combate": "",
     "anotacoes": "",
     "owner": "bewlla",
-    "updatedAt": 1794760095233
+    "updatedAt": 1795304872457
   },
   "1794690046775": {
     "id": "1794690046775",
